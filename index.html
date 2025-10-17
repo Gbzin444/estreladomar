@@ -483,6 +483,42 @@
             font-size: 12px;
         }
 
+        .self-destruct-button {
+            background: linear-gradient(45deg, #ff5252, #ff7675);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 82, 82, 0.3);
+        }
+
+        .self-destruct-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 82, 82, 0.4);
+        }
+
+        .self-destruct-button:active {
+            transform: translateY(0);
+        }
+
+        .self-destruct-sender {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .dark-theme .self-destruct-sender {
+            color: #aaa;
+        }
+
         .chatgpt-typing {
             display: inline-flex;
             align-items: center;
@@ -510,6 +546,96 @@
         @keyframes typing {
             0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
             40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Self Destruct Modal */
+        .self-destruct-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .self-destruct-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid #ff5252;
+            position: relative;
+            animation: modalAppear 0.3s ease-out;
+        }
+
+        .dark-theme .self-destruct-content {
+            background: #2d2d42;
+            color: #e0e0e0;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .self-destruct-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: #ff5252;
+        }
+
+        .self-destruct-header i {
+            font-size: 24px;
+        }
+
+        .self-destruct-message {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255, 82, 82, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #ff5252;
+        }
+
+        .self-destruct-timer {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .self-destruct-close {
+            background: #ff5252;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .self-destruct-close:hover {
+            background: #ff3838;
+            transform: translateY(-2px);
         }
 
         /* Reply Preview Styles */
@@ -718,7 +844,7 @@
             padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-size: 16px;
             background: white;
         }
@@ -729,10 +855,69 @@
             color: #e0e0e0;
         }
 
+        .settings-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dark-theme .settings-option {
+            border-bottom: 1px solid #444;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
         .modal-buttons {
             display: flex;
             gap: 10px;
             justify-content: flex-end;
+            margin-top: 20px;
         }
 
         .modal-btn {
@@ -790,14 +975,42 @@
         <div class="theme-option theme-orange" data-theme="orange"></div>
     </div>
 
+    <!-- Self Destruct Modal -->
+    <div class="self-destruct-modal" id="selfDestructModal">
+        <div class="self-destruct-content">
+            <div class="self-destruct-header">
+                <i class="fas fa-bomb"></i>
+                <h3>Mensagem Secreta</h3>
+            </div>
+            <div class="self-destruct-message" id="selfDestructMessage">
+                <!-- Message content will be inserted here -->
+            </div>
+            <div class="self-destruct-timer" id="selfDestructTimer">
+                Esta mensagem se auto-destruirá em <span id="countdown">5</span> segundos
+            </div>
+            <button class="self-destruct-close" id="closeSelfDestruct">
+                Fechar Mensagem
+            </button>
+        </div>
+    </div>
+
     <!-- API Key Modal -->
     <div class="modal" id="apiKeyModal">
         <div class="modal-content">
-            <h3>Configurar ChatGPT</h3>
-            <p>Para usar o ChatGPT real, você precisa fornecer uma chave de API da OpenAI.</p>
-            <p><small>Dica: Use um servidor proxy para evitar problemas de CORS</small></p>
+            <h3>Configurações</h3>
+            
+            <div class="settings-option">
+                <span>Esconder meu nome</span>
+                <label class="switch">
+                    <input type="checkbox" id="hideNameToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <p>Configurações do ChatGPT:</p>
             <input type="password" class="api-key-input" id="apiKeyInput" placeholder="Cole sua chave de API da OpenAI aqui">
-            <input type="text" class="api-key-input" id="proxyUrlInput" placeholder="URL do proxy (opcional)" value="https://cors-anywhere.herokuapp.com/">
+            <input type="text" class="api-key-input" id="proxyUrlInput" placeholder="URL do proxy (opcional)" value="https://api.allorigins.win/raw?url=">
+            
             <div class="modal-buttons">
                 <button class="modal-btn secondary" id="cancelApiKey">Cancelar</button>
                 <button class="modal-btn primary" id="saveApiKey">Salvar</button>
@@ -940,6 +1153,12 @@
         const saveApiKey = document.getElementById('saveApiKey');
         const cancelApiKey = document.getElementById('cancelApiKey');
         const settingsBtn = document.getElementById('settingsBtn');
+        const selfDestructModal = document.getElementById('selfDestructModal');
+        const selfDestructMessage = document.getElementById('selfDestructMessage');
+        const selfDestructTimer = document.getElementById('selfDestructTimer');
+        const closeSelfDestruct = document.getElementById('closeSelfDestruct');
+        const countdownElement = document.getElementById('countdown');
+        const hideNameToggle = document.getElementById('hideNameToggle');
 
         // App State
         let currentUser = '';
@@ -950,11 +1169,15 @@
         let userPresenceRef;
         let usersOnline = 0;
         let openaiApiKey = localStorage.getItem('openai_api_key');
-        let proxyUrl = localStorage.getItem('proxy_url') || 'https://cors-anywhere.herokuapp.com/';
+        let proxyUrl = localStorage.getItem('proxy_url') || 'https://api.allorigins.win/raw?url=';
         let chatGPTTyping = false;
+        let hideName = localStorage.getItem('hide_name') === 'true';
+        let countdownInterval;
+        let currentSelfDestructMessage = null;
 
-        // Set proxy URL in input
+        // Set proxy URL in input and hide name toggle
         proxyUrlInput.value = proxyUrl;
+        hideNameToggle.checked = hideName;
 
         // Check if API key is needed
         if (!openaiApiKey) {
@@ -970,13 +1193,15 @@
             
             if (key) {
                 openaiApiKey = key;
-                proxyUrl = proxy || 'https://cors-anywhere.herokuapp.com/';
+                proxyUrl = proxy || 'https://api.allorigins.win/raw?url=';
+                hideName = hideNameToggle.checked;
                 
                 localStorage.setItem('openai_api_key', key);
                 localStorage.setItem('proxy_url', proxyUrl);
+                localStorage.setItem('hide_name', hideName);
                 
                 apiKeyModal.style.display = 'none';
-                alert('Chave de API salva com sucesso!');
+                alert('Configurações salvas com sucesso!');
             } else {
                 alert('Por favor, insira uma chave de API válida.');
             }
@@ -989,7 +1214,22 @@
         settingsBtn.addEventListener('click', () => {
             apiKeyInput.value = openaiApiKey || '';
             proxyUrlInput.value = proxyUrl;
+            hideNameToggle.checked = hideName;
             apiKeyModal.style.display = 'flex';
+        });
+
+        // Self Destruct Modal handlers
+        closeSelfDestruct.addEventListener('click', () => {
+            selfDestructModal.style.display = 'none';
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            
+            // Mark message as viewed and remove it
+            if (currentSelfDestructMessage) {
+                database.ref('messages/' + currentSelfDestructMessage.id).remove();
+                currentSelfDestructMessage = null;
+            }
         });
 
         // Password check
@@ -1123,7 +1363,7 @@
                     // Remove typing indicator
                     removeChatGPTTyping();
                     // Add error message
-                    addMessageToFirebase('ChatGPT', `Erro: ${error.message}. Verifique sua chave de API e a URL do proxy.`, 'text', true);
+                    addMessageToFirebase('ChatGPT', `Erro: ${error.message}`, 'text', true);
                     console.error('ChatGPT Error:', error);
                 }
             } else {
@@ -1141,52 +1381,39 @@
             selfDestructBtn.classList.remove('active');
         }
 
-        // Call ChatGPT API with proxy to avoid CORS
+        // Call ChatGPT API with better proxy
         async function callChatGPT(question) {
             const apiUrl = 'https://api.openai.com/v1/chat/completions';
-            const requestBody = {
-                model: 'gpt-3.5-turbo',
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'Você é um assistente útil que responde em português. Seja conciso e direto em suas respostas.'
-                    },
-                    {
-                        role: 'user',
-                        content: question
-                    }
-                ],
-                max_tokens: 500,
-                temperature: 0.7
-            };
+            
+            // Use a more reliable CORS proxy
+            const proxy = proxyUrl || 'https://api.allorigins.win/raw?url=';
+            const url = proxy + encodeURIComponent(apiUrl);
 
-            // Try with proxy first, then direct if proxy fails
-            let response;
-            try {
-                response = await fetch(proxyUrl + apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${openaiApiKey}`
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-            } catch (proxyError) {
-                console.log('Proxy failed, trying direct connection...');
-                // Try direct connection
-                response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${openaiApiKey}`
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-            }
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${openaiApiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'Você é um assistente útil que responde em português. Seja conciso e direto em suas respostas.'
+                        },
+                        {
+                            role: 'user',
+                            content: question
+                        }
+                    ],
+                    max_tokens: 500,
+                    temperature: 0.7
+                })
+            });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
@@ -1306,7 +1533,8 @@
         // Add message to Firebase
         function addMessageToFirebase(sender, content, type, isChatGPT = false, fileName = '', fileSize = 0, replyTo = null, selfDestruct = false) {
             const message = {
-                sender: sender,
+                sender: hideName && !isChatGPT ? 'Anônimo' : sender,
+                originalSender: sender, // Store original sender for self-destruct messages
                 content: content,
                 type: type,
                 timestamp: Date.now(),
@@ -1315,9 +1543,8 @@
                 fileSize: fileSize,
                 replyTo: replyTo,
                 selfDestruct: selfDestruct,
-                // Store viewers instead of readBy for self-destruct messages
-                viewers: selfDestruct ? { [currentUser]: true } : {},
-                readBy: selfDestruct ? {} : { [currentUser]: true }
+                viewers: {},
+                readBy: { [currentUser]: true }
             };
             
             database.ref('messages').push(message);
@@ -1343,7 +1570,7 @@
         // Display message in the chat
         function displayMessage(message, messageId) {
             const messageDiv = document.createElement('div');
-            const isSent = message.sender === currentUser;
+            const isSent = message.originalSender === currentUser;
             const isChatGPT = message.isChatGPT;
             
             messageDiv.classList.add('message');
@@ -1362,42 +1589,63 @@
                 `;
             }
             
-            if (message.type === 'text') {
-                messageContent += `
-                    <div class="message-content">${message.content}</div>
-                `;
-            } else if (message.type === 'image') {
-                messageContent += `
-                    <div class="image-message">
-                        <img src="${message.content}" alt="Imagem compartilhada">
-                    </div>
-                `;
-            } else if (message.type === 'file') {
-                messageContent += `
-                    <div class="file-message">
-                        <i class="fas fa-file file-icon"></i>
-                        <div class="file-info">
-                            <div class="file-name">${message.fileName}</div>
-                            <div class="file-size">${formatFileSize(message.fileSize)}</div>
+            if (message.selfDestruct && !isSent) {
+                // Show button for self-destruct messages from others
+                const hasViewed = message.viewers && message.viewers[currentUser];
+                
+                if (!hasViewed) {
+                    messageContent += `
+                        <div class="self-destruct-sender">De: ${message.sender}</div>
+                        <button class="self-destruct-button" data-id="${messageId}" data-content="${message.content}">
+                            <i class="fas fa-bomb"></i>
+                            Abrir Mensagem Secreta
+                        </button>
+                    `;
+                } else {
+                    messageContent += `
+                        <div class="self-destruct-sender">De: ${message.sender}</div>
+                        <div class="message-content">🔒 Mensagem já visualizada e destruída</div>
+                    `;
+                }
+            } else {
+                // Normal message display
+                if (message.type === 'text') {
+                    messageContent += `
+                        <div class="message-content">${message.content}</div>
+                    `;
+                } else if (message.type === 'image') {
+                    messageContent += `
+                        <div class="image-message">
+                            <img src="${message.content}" alt="Imagem compartilhada">
                         </div>
-                        <a href="${message.content}" download><i class="fas fa-download"></i></a>
-                    </div>
-                `;
-            }
-            
-            // Add self-destruct indicator
-            if (message.selfDestruct) {
-                messageContent += `
-                    <div class="self-destruct-indicator">
-                        <i class="fas fa-bomb self-destruct-icon"></i>
-                        Auto-destruição (vista por ${Object.keys(message.viewers || {}).length} usuários)
-                    </div>
-                `;
+                    `;
+                } else if (message.type === 'file') {
+                    messageContent += `
+                        <div class="file-message">
+                            <i class="fas fa-file file-icon"></i>
+                            <div class="file-info">
+                                <div class="file-name">${message.fileName}</div>
+                                <div class="file-size">${formatFileSize(message.fileSize)}</div>
+                            </div>
+                            <a href="${message.content}" download><i class="fas fa-download"></i></a>
+                        </div>
+                    `;
+                }
+                
+                // Add self-destruct indicator for sent messages
+                if (message.selfDestruct && isSent) {
+                    messageContent += `
+                        <div class="self-destruct-indicator">
+                            <i class="fas fa-bomb self-destruct-icon"></i>
+                            Mensagem secreta (vista por ${Object.keys(message.viewers || {}).length} usuários)
+                        </div>
+                    `;
+                }
             }
             
             // Add timestamp and read receipt
             const readCount = Object.keys(message.readBy || {}).length;
-            const isRead = readCount > 1; // More than just the sender has read it
+            const isRead = readCount > 1;
             
             messageContent += `
                 <div class="message-time">
@@ -1419,8 +1667,8 @@
                         </button>
                     </div>
                 `;
-            } else {
-                // Add reply button for others' messages
+            } else if (!message.selfDestruct) {
+                // Add reply button for others' normal messages
                 messageContent += `
                     <div class="message-actions">
                         <button class="message-action-btn reply-btn" data-message='${JSON.stringify({
@@ -1444,42 +1692,56 @@
                 deleteBtn.addEventListener('click', () => {
                     deleteMessage(messageId);
                 });
-            } else {
-                // Add reply functionality
+            } else if (!message.selfDestruct) {
+                // Add reply functionality for normal messages
                 const replyBtn = messageDiv.querySelector('.reply-btn');
-                replyBtn.addEventListener('click', (e) => {
-                    const messageData = JSON.parse(e.target.closest('.reply-btn').dataset.message);
-                    setReplyMessage(messageData);
-                });
-            }
-            
-            // Handle self-destruct message viewing
-            if (message.selfDestruct && !isSent) {
-                // Mark message as viewed by current user
-                if (!message.viewers || !message.viewers[currentUser]) {
-                    database.ref('messages/' + messageId + '/viewers/' + currentUser).set(true);
-                    
-                    // Set a timeout to remove the message after viewing
-                    setTimeout(() => {
-                        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
-                        if (messageElement) {
-                            messageElement.style.opacity = '0.5';
-                            messageElement.style.transition = 'opacity 1s';
-                            
-                            setTimeout(() => {
-                                messageElement.remove();
-                                // Remove from Firebase after it disappears for everyone
-                                database.ref('messages/' + messageId).remove();
-                            }, 1000);
-                        }
-                    }, 5000); // Message disappears after 5 seconds of viewing
+                if (replyBtn) {
+                    replyBtn.addEventListener('click', (e) => {
+                        const messageData = JSON.parse(e.target.closest('.reply-btn').dataset.message);
+                        setReplyMessage(messageData);
+                    });
                 }
             }
             
-            // Add data attribute for self-destruct messages
-            if (message.selfDestruct) {
-                messageDiv.setAttribute('data-message-id', messageId);
+            // Add self-destruct button functionality
+            if (message.selfDestruct && !isSent) {
+                const selfDestructButton = messageDiv.querySelector('.self-destruct-button');
+                if (selfDestructButton) {
+                    selfDestructButton.addEventListener('click', (e) => {
+                        const content = e.target.closest('.self-destruct-button').dataset.content;
+                        const id = e.target.closest('.self-destruct-button').dataset.id;
+                        showSelfDestructMessage(content, id, message.sender);
+                    });
+                }
             }
+        }
+
+        // Show self-destruct message in modal
+        function showSelfDestructMessage(content, messageId, sender) {
+            selfDestructMessage.textContent = content;
+            currentSelfDestructMessage = { id: messageId, content: content };
+            
+            // Mark message as viewed
+            database.ref('messages/' + messageId + '/viewers/' + currentUser).set(true);
+            
+            // Start countdown
+            let countdown = 5;
+            countdownElement.textContent = countdown;
+            
+            selfDestructModal.style.display = 'flex';
+            
+            countdownInterval = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    selfDestructModal.style.display = 'none';
+                    // Remove message from Firebase
+                    database.ref('messages/' + messageId).remove();
+                    currentSelfDestructMessage = null;
+                }
+            }, 1000);
         }
 
         // Set reply message
@@ -1543,17 +1805,12 @@
 
         // Add some sample messages on first load
         window.addEventListener('load', () => {
-            // In a real app, you would check if messages already exist
-            // For this demo, we'll add some sample messages if the chat is empty
             setTimeout(() => {
                 if (isUnlocked) {
                     const messagesRef = database.ref('messages');
                     messagesRef.once('value', (snapshot) => {
                         if (!snapshot.exists()) {
-                            // Add welcome message
                             addMessageToFirebase('Sistema', 'Bem-vindo ao Chat Global! Comece a conversar com pessoas de todo o mundo.', 'text');
-                            
-                            // Add ChatGPT info message
                             addMessageToFirebase('Sistema', 'Digite @chatgpt seguido da sua pergunta para obter assistência de IA.', 'text');
                         }
                     });
