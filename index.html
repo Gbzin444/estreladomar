@@ -1009,7 +1009,14 @@
 
             <p>Configurações do ChatGPT:</p>
             <input type="password" class="api-key-input" id="apiKeyInput" placeholder="Cole sua chave de API da OpenAI aqui">
-            <input type="text" class="api-key-input" id="proxyUrlInput" placeholder="URL do proxy (opcional)" value="https://api.allorigins.win/raw?url=">
+            <select class="api-key-input" id="proxySelect">
+                <option value="none">Sem Proxy (pode causar erro CORS)</option>
+                <option value="allorigins">AllOrigins (Recomendado)</option>
+                <option value="corsanywhere">CORS Anywhere</option>
+                <option value="corsproxy">CORS Proxy</option>
+                <option value="custom">Customizado</option>
+            </select>
+            <input type="text" class="api-key-input" id="customProxyInput" placeholder="URL do proxy customizado" style="display: none;">
             
             <div class="modal-buttons">
                 <button class="modal-btn secondary" id="cancelApiKey">Cancelar</button>
@@ -1149,7 +1156,8 @@
         const themeOptions = document.querySelectorAll('.theme-option');
         const apiKeyModal = document.getElementById('apiKeyModal');
         const apiKeyInput = document.getElementById('apiKeyInput');
-        const proxyUrlInput = document.getElementById('proxyUrlInput');
+        const proxySelect = document.getElementById('proxySelect');
+        const customProxyInput = document.getElementById('customProxyInput');
         const saveApiKey = document.getElementById('saveApiKey');
         const cancelApiKey = document.getElementById('cancelApiKey');
         const settingsBtn = document.getElementById('settingsBtn');
@@ -1169,15 +1177,38 @@
         let userPresenceRef;
         let usersOnline = 0;
         let openaiApiKey = localStorage.getItem('openai_api_key');
-        let proxyUrl = localStorage.getItem('proxy_url') || 'https://api.allorigins.win/raw?url=';
+        let proxyType = localStorage.getItem('proxy_type') || 'allorigins';
+        let customProxyUrl = localStorage.getItem('custom_proxy_url') || '';
         let chatGPTTyping = false;
         let hideName = localStorage.getItem('hide_name') === 'true';
         let countdownInterval;
         let currentSelfDestructMessage = null;
 
-        // Set proxy URL in input and hide name toggle
-        proxyUrlInput.value = proxyUrl;
+        // Proxy configurations
+        const proxyConfigs = {
+            'none': '',
+            'allorigins': 'https://api.allorigins.win/raw?url=',
+            'corsanywhere': 'https://cors-anywhere.herokuapp.com/',
+            'corsproxy': 'https://corsproxy.io/?',
+            'custom': customProxyUrl
+        };
+
+        // Initialize settings
+        proxySelect.value = proxyType;
+        if (proxyType === 'custom') {
+            customProxyInput.style.display = 'block';
+            customProxyInput.value = customProxyUrl;
+        }
         hideNameToggle.checked = hideName;
+
+        // Proxy selection handler
+        proxySelect.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customProxyInput.style.display = 'block';
+            } else {
+                customProxyInput.style.display = 'none';
+            }
+        });
 
         // Check if API key is needed
         if (!openaiApiKey) {
@@ -1189,15 +1220,20 @@
         // API Key Modal handlers
         saveApiKey.addEventListener('click', () => {
             const key = apiKeyInput.value.trim();
-            const proxy = proxyUrlInput.value.trim();
+            proxyType = proxySelect.value;
+            
+            if (proxyType === 'custom') {
+                customProxyUrl = customProxyInput.value.trim();
+                proxyConfigs.custom = customProxyUrl;
+            }
             
             if (key) {
                 openaiApiKey = key;
-                proxyUrl = proxy || 'https://api.allorigins.win/raw?url=';
                 hideName = hideNameToggle.checked;
                 
                 localStorage.setItem('openai_api_key', key);
-                localStorage.setItem('proxy_url', proxyUrl);
+                localStorage.setItem('proxy_type', proxyType);
+                localStorage.setItem('custom_proxy_url', customProxyUrl);
                 localStorage.setItem('hide_name', hideName);
                 
                 apiKeyModal.style.display = 'none';
@@ -1213,7 +1249,13 @@
 
         settingsBtn.addEventListener('click', () => {
             apiKeyInput.value = openaiApiKey || '';
-            proxyUrlInput.value = proxyUrl;
+            proxySelect.value = proxyType;
+            if (proxyType === 'custom') {
+                customProxyInput.style.display = 'block';
+                customProxyInput.value = customProxyUrl;
+            } else {
+                customProxyInput.style.display = 'none';
+            }
             hideNameToggle.checked = hideName;
             apiKeyModal.style.display = 'flex';
         });
@@ -1363,7 +1405,7 @@
                     // Remove typing indicator
                     removeChatGPTTyping();
                     // Add error message
-                    addMessageToFirebase('ChatGPT', `Erro: ${error.message}`, 'text', true);
+                    addMessageToFirebase('ChatGPT', `Erro ao conectar com ChatGPT: ${error.message}. Verifique sua conexão e configurações de proxy.`, 'text', true);
                     console.error('ChatGPT Error:', error);
                 }
             } else {
@@ -1381,43 +1423,101 @@
             selfDestructBtn.classList.remove('active');
         }
 
-        // Call ChatGPT API with better proxy
+        // Call ChatGPT API with multiple proxy fallbacks
         async function callChatGPT(question) {
             const apiUrl = 'https://api.openai.com/v1/chat/completions';
             
-            // Use a more reliable CORS proxy
-            const proxy = proxyUrl || 'https://api.allorigins.win/raw?url=';
-            const url = proxy + encodeURIComponent(apiUrl);
+            // Try different proxy methods
+            const methods = [
+                () => tryWithProxy(proxyType),
+                () => tryWithProxy('allorigins'),
+                () => tryWithProxy('corsproxy'),
+                () => tryDirectConnection()
+            ];
 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${openaiApiKey}`
-                },
-                body: JSON.stringify({
-                    model: 'gpt-3.5-turbo',
-                    messages: [
-                        {
-                            role: 'system',
-                            content: 'Você é um assistente útil que responde em português. Seja conciso e direto em suas respostas.'
-                        },
-                        {
-                            role: 'user',
-                            content: question
-                        }
-                    ],
-                    max_tokens: 500,
-                    temperature: 0.7
-                })
-            });
+            for (let method of methods) {
+                try {
+                    const result = await method();
+                    return result;
+                } catch (error) {
+                    console.log(`Method failed: ${error.message}`);
+                    continue;
+                }
+            }
+            
+            throw new Error('Todas as tentativas de conexão falharam. Verifique sua conexão com a internet.');
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            async function tryWithProxy(proxyType) {
+                const proxyUrl = proxyConfigs[proxyType];
+                if (!proxyUrl && proxyType !== 'none') {
+                    throw new Error(`Proxy ${proxyType} não configurado`);
+                }
+
+                const url = proxyType === 'none' ? apiUrl : proxyUrl + encodeURIComponent(apiUrl);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${openaiApiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'Você é um assistente útil que responde em português. Seja conciso e direto em suas respostas.'
+                            },
+                            {
+                                role: 'user',
+                                content: question
+                            }
+                        ],
+                        max_tokens: 500,
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.choices[0].message.content;
             }
 
-            const data = await response.json();
-            return data.choices[0].message.content;
+            async function tryDirectConnection() {
+                // Try direct connection as last resort
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${openaiApiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'Você é um assistente útil que responde em português. Seja conciso e direto em suas respostas.'
+                            },
+                            {
+                                role: 'user',
+                                content: question
+                            }
+                        ],
+                        max_tokens: 500,
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.choices[0].message.content;
+            }
         }
 
         // Show ChatGPT typing indicator
