@@ -795,7 +795,9 @@
         <div class="modal-content">
             <h3>Configurar ChatGPT</h3>
             <p>Para usar o ChatGPT real, você precisa fornecer uma chave de API da OpenAI.</p>
+            <p><small>Dica: Use um servidor proxy para evitar problemas de CORS</small></p>
             <input type="password" class="api-key-input" id="apiKeyInput" placeholder="Cole sua chave de API da OpenAI aqui">
+            <input type="text" class="api-key-input" id="proxyUrlInput" placeholder="URL do proxy (opcional)" value="https://cors-anywhere.herokuapp.com/">
             <div class="modal-buttons">
                 <button class="modal-btn secondary" id="cancelApiKey">Cancelar</button>
                 <button class="modal-btn primary" id="saveApiKey">Salvar</button>
@@ -934,6 +936,7 @@
         const themeOptions = document.querySelectorAll('.theme-option');
         const apiKeyModal = document.getElementById('apiKeyModal');
         const apiKeyInput = document.getElementById('apiKeyInput');
+        const proxyUrlInput = document.getElementById('proxyUrlInput');
         const saveApiKey = document.getElementById('saveApiKey');
         const cancelApiKey = document.getElementById('cancelApiKey');
         const settingsBtn = document.getElementById('settingsBtn');
@@ -947,7 +950,11 @@
         let userPresenceRef;
         let usersOnline = 0;
         let openaiApiKey = localStorage.getItem('openai_api_key');
+        let proxyUrl = localStorage.getItem('proxy_url') || 'https://cors-anywhere.herokuapp.com/';
         let chatGPTTyping = false;
+
+        // Set proxy URL in input
+        proxyUrlInput.value = proxyUrl;
 
         // Check if API key is needed
         if (!openaiApiKey) {
@@ -959,9 +966,15 @@
         // API Key Modal handlers
         saveApiKey.addEventListener('click', () => {
             const key = apiKeyInput.value.trim();
+            const proxy = proxyUrlInput.value.trim();
+            
             if (key) {
                 openaiApiKey = key;
+                proxyUrl = proxy || 'https://cors-anywhere.herokuapp.com/';
+                
                 localStorage.setItem('openai_api_key', key);
+                localStorage.setItem('proxy_url', proxyUrl);
+                
                 apiKeyModal.style.display = 'none';
                 alert('Chave de API salva com sucesso!');
             } else {
@@ -974,6 +987,8 @@
         });
 
         settingsBtn.addEventListener('click', () => {
+            apiKeyInput.value = openaiApiKey || '';
+            proxyUrlInput.value = proxyUrl;
             apiKeyModal.style.display = 'flex';
         });
 
@@ -1108,7 +1123,7 @@
                     // Remove typing indicator
                     removeChatGPTTyping();
                     // Add error message
-                    addMessageToFirebase('ChatGPT', 'Desculpe, ocorreu um erro ao processar sua solicitação. Verifique sua chave de API.', 'text', true);
+                    addMessageToFirebase('ChatGPT', `Erro: ${error.message}. Verifique sua chave de API e a URL do proxy.`, 'text', true);
                     console.error('ChatGPT Error:', error);
                 }
             } else {
@@ -1126,33 +1141,52 @@
             selfDestructBtn.classList.remove('active');
         }
 
-        // Call ChatGPT API
+        // Call ChatGPT API with proxy to avoid CORS
         async function callChatGPT(question) {
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${openaiApiKey}`
-                },
-                body: JSON.stringify({
-                    model: 'gpt-3.5-turbo',
-                    messages: [
-                        {
-                            role: 'system',
-                            content: 'Você é um assistente útil que responde em português. Seja conciso e direto em suas respostas.'
-                        },
-                        {
-                            role: 'user',
-                            content: question
-                        }
-                    ],
-                    max_tokens: 500,
-                    temperature: 0.7
-                })
-            });
+            const apiUrl = 'https://api.openai.com/v1/chat/completions';
+            const requestBody = {
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'Você é um assistente útil que responde em português. Seja conciso e direto em suas respostas.'
+                    },
+                    {
+                        role: 'user',
+                        content: question
+                    }
+                ],
+                max_tokens: 500,
+                temperature: 0.7
+            };
+
+            // Try with proxy first, then direct if proxy fails
+            let response;
+            try {
+                response = await fetch(proxyUrl + apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${openaiApiKey}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+            } catch (proxyError) {
+                console.log('Proxy failed, trying direct connection...');
+                // Try direct connection
+                response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${openaiApiKey}`
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+            }
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
             }
 
             const data = await response.json();
@@ -1281,12 +1315,10 @@
                 fileSize: fileSize,
                 replyTo: replyTo,
                 selfDestruct: selfDestruct,
-                readBy: {},
-                views: 0
+                // Store viewers instead of readBy for self-destruct messages
+                viewers: selfDestruct ? { [currentUser]: true } : {},
+                readBy: selfDestruct ? {} : { [currentUser]: true }
             };
-            
-            // Add current user to readBy
-            message.readBy[currentUser] = true;
             
             database.ref('messages').push(message);
         }
@@ -1310,11 +1342,6 @@
 
         // Display message in the chat
         function displayMessage(message, messageId) {
-            // Skip self-destruct messages that have been viewed by current user
-            if (message.selfDestruct && message.readBy && message.readBy[currentUser] && message.sender !== currentUser) {
-                return;
-            }
-            
             const messageDiv = document.createElement('div');
             const isSent = message.sender === currentUser;
             const isChatGPT = message.isChatGPT;
@@ -1363,7 +1390,7 @@
                 messageContent += `
                     <div class="self-destruct-indicator">
                         <i class="fas fa-bomb self-destruct-icon"></i>
-                        Auto-destruição
+                        Auto-destruição (vista por ${Object.keys(message.viewers || {}).length} usuários)
                     </div>
                 `;
             }
@@ -1427,22 +1454,26 @@
             }
             
             // Handle self-destruct message viewing
-            if (message.selfDestruct && !isSent && (!message.readBy || !message.readBy[currentUser])) {
-                // Mark message as viewed
-                database.ref('messages/' + messageId + '/readBy/' + currentUser).set(true);
-                
-                // Set a timeout to remove the message after viewing
-                setTimeout(() => {
-                    const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
-                    if (messageElement) {
-                        messageElement.style.opacity = '0.5';
-                        messageElement.style.transition = 'opacity 1s';
-                        
-                        setTimeout(() => {
-                            messageElement.remove();
-                        }, 1000);
-                    }
-                }, 5000); // Message disappears after 5 seconds of viewing
+            if (message.selfDestruct && !isSent) {
+                // Mark message as viewed by current user
+                if (!message.viewers || !message.viewers[currentUser]) {
+                    database.ref('messages/' + messageId + '/viewers/' + currentUser).set(true);
+                    
+                    // Set a timeout to remove the message after viewing
+                    setTimeout(() => {
+                        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+                        if (messageElement) {
+                            messageElement.style.opacity = '0.5';
+                            messageElement.style.transition = 'opacity 1s';
+                            
+                            setTimeout(() => {
+                                messageElement.remove();
+                                // Remove from Firebase after it disappears for everyone
+                                database.ref('messages/' + messageId).remove();
+                            }, 1000);
+                        }
+                    }, 5000); // Message disappears after 5 seconds of viewing
+                }
             }
             
             // Add data attribute for self-destruct messages
@@ -1483,8 +1514,8 @@
                     const message = childSnapshot.val();
                     const messageId = childSnapshot.key;
                     
-                    // If current user hasn't read this message yet
-                    if (!message.readBy || !message.readBy[currentUser]) {
+                    // If current user hasn't read this message yet and it's not self-destruct
+                    if (!message.selfDestruct && (!message.readBy || !message.readBy[currentUser])) {
                         updates[`messages/${messageId}/readBy/${currentUser}`] = true;
                     }
                 });
