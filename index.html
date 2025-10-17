@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Global Avançado com IA Profissional</title>
+    <title>Chat Global Avançado</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-automl@1.0.0/dist/index.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
@@ -887,63 +885,6 @@
             margin-left: 8px;
             vertical-align: middle;
         }
-
-        /* Self-destruct styles */
-        .self-destruct-indicator {
-            background: rgba(255, 82, 82, 0.1);
-            border: 1px solid #ff5252;
-            color: #ff5252;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 11px;
-            margin-top: 8px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .self-destruct-indicator i {
-            font-size: 10px;
-        }
-
-        .message[data-message-id] {
-            transition: opacity 0.5s ease;
-        }
-
-        .self-destruct-timer {
-            font-weight: bold;
-            margin-left: 5px;
-        }
-
-        /* Loading indicator for AI */
-        .ai-loading {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            margin: 10px 0;
-        }
-
-        .ai-loading-text {
-            font-size: 14px;
-            color: var(--text-light);
-        }
-
-        .ai-loading-spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid transparent;
-            border-top: 2px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body class="theme-blue">
@@ -1186,467 +1127,190 @@
         // Apply saved customization
         applyCustomization();
 
-        // Professional Neural Network Implementation
-        class ProfessionalNeuralNetwork {
+        // Enhanced GabrIA Neural Network
+        class GabrIANeuralNetwork {
             constructor() {
-                this.model = null;
-                this.tokenizer = null;
-                this.vocab = {};
-                this.maxLength = 100;
-                this.isModelLoaded = false;
                 this.knowledgeBase = this.initializeKnowledgeBase();
-                this.conversationMemory = [];
-                this.userProfile = {};
-            }
-
-            async initializeModel() {
-                try {
-                    // Create a simple neural network model for text generation
-                    this.model = tf.sequential({
-                        layers: [
-                            tf.layers.dense({inputShape: [100], units: 128, activation: 'relu'}),
-                            tf.layers.dropout({rate: 0.3}),
-                            tf.layers.dense({units: 64, activation: 'relu'}),
-                            tf.layers.dropout({rate: 0.2}),
-                            tf.layers.dense({units: 32, activation: 'relu'}),
-                            tf.layers.dense({units: 100, activation: 'softmax'})
-                        ]
-                    });
-
-                    // Compile the model
-                    this.model.compile({
-                        optimizer: 'adam',
-                        loss: 'categoricalCrossentropy',
-                        metrics: ['accuracy']
-                    });
-
-                    // Initialize tokenizer with basic vocabulary
-                    this.initializeTokenizer();
-                    this.isModelLoaded = true;
-                    console.log('Professional Neural Network initialized successfully');
-                } catch (error) {
-                    console.error('Error initializing neural network:', error);
-                    this.isModelLoaded = false;
-                }
-            }
-
-            initializeTokenizer() {
-                // Create a basic tokenizer with common Portuguese words
-                const commonWords = [
-                    'o', 'a', 'e', 'de', 'do', 'da', 'em', 'um', 'uma', 'para', 'com', 'não', 'uma', 'os', 'as', 
-                    'se', 'por', 'mais', 'mas', 'como', 'está', 'muito', 'bem', 'obrigado', 'por favor', 'sim', 'não',
-                    'que', 'eu', 'ele', 'ela', 'nós', 'você', 'eles', 'elas', 'isso', 'isto', 'aquilo', 'meu', 'minha',
-                    'seu', 'sua', 'nosso', 'nossa', 'dele', 'dela', 'tem', 'tenho', 'tem', 'temos', 'têm', 'foi', 'era',
-                    'sou', 'é', 'somos', 'são', 'vou', 'vai', 'vamos', 'vão', 'pode', 'posso', 'podemos', 'podem',
-                    'gosto', 'gosta', 'gostamos', 'gostam', 'quer', 'quero', 'queremos', 'querem', 'precisa', 'preciso',
-                    'precisamos', 'precisam', 'ajuda', 'ajudar', 'pergunta', 'responder', 'explicar', 'entender',
-                    'saber', 'conhecer', 'pensar', 'acreditar', 'sentir', 'fazer', 'dizer', 'falar', 'conversar'
-                ];
-
-                // Add specialized vocabulary for different domains
-                const techWords = [
-                    'tecnologia', 'programação', 'código', 'software', 'hardware', 'aplicativo', 'web', 'internet',
-                    'computador', 'celular', 'smartphone', 'tablet', 'rede', 'dados', 'informação', 'sistema',
-                    'algoritmo', 'inteligência', 'artificial', 'machine learning', 'deep learning', 'neural',
-                    'rede neural', 'python', 'javascript', 'html', 'css', 'react', 'node', 'api', 'database',
-                    'firebase', 'tensorflow', 'modelo', 'treinamento', 'previsão', 'classificação'
-                ];
-
-                const generalKnowledge = [
-                    'ciência', 'história', 'geografia', 'matemática', 'física', 'química', 'biologia', 'arte',
-                    'música', 'literatura', 'filme', 'série', 'livro', 'esporte', 'saúde', 'educação', 'trabalho',
-                    'negócios', 'economia', 'política', 'cultura', 'sociedade', 'meio ambiente', 'natureza',
-                    'universo', 'planeta', 'país', 'cidade', 'pessoa', 'lugar', 'tempo', 'clima'
-                ];
-
-                // Combine all vocabularies
-                const allWords = [...commonWords, ...techWords, ...generalKnowledge];
-                
-                // Create token to index mapping
-                this.vocab = {};
-                allWords.forEach((word, index) => {
-                    this.vocab[word] = index + 1; // 0 is reserved for padding
-                });
-
-                // Add special tokens
-                this.vocab['<UNK>'] = 0;
-                this.vocab['<START>'] = allWords.length + 1;
-                this.vocab['<END>'] = allWords.length + 2;
-
-                console.log('Tokenizer initialized with vocabulary size:', Object.keys(this.vocab).length);
-            }
-
-            tokenize(text) {
-                // Simple tokenization by splitting on spaces and punctuation
-                const tokens = text.toLowerCase()
-                    .replace(/[.,!?;:]/g, ' ')
-                    .split(/\s+/)
-                    .filter(token => token.length > 0);
-
-                // Convert tokens to indices
-                const indices = tokens.map(token => this.vocab[token] || this.vocab['<UNK>']);
-                
-                // Pad or truncate to maxLength
-                if (indices.length < this.maxLength) {
-                    const padding = Array(this.maxLength - indices.length).fill(0);
-                    return [...indices, ...padding];
-                } else {
-                    return indices.slice(0, this.maxLength);
-                }
+                this.conversationContext = [];
+                this.userPreferences = {};
             }
 
             initializeKnowledgeBase() {
                 return {
                     greetings: {
-                        patterns: ['olá', 'oi', 'e aí', 'bom dia', 'boa tarde', 'boa noite', 'saudações', 'hey', 'hello', 'opa'],
+                        patterns: ['olá', 'oi', 'e aí', 'bom dia', 'boa tarde', 'boa noite', 'saudações'],
                         responses: [
-                            'Olá! Sou a GabrIA, uma rede neural profissional. Como posso ajudá-lo hoje?',
+                            'Olá! Sou a GabrIA, sua assistente inteligente. Como posso ajudá-lo hoje?',
                             'Oi! É um prazer conversar com você. Em que posso ser útil?',
                             'Saudações! Estou aqui para ajudar com qualquer dúvida ou tarefa.',
-                            'Bom te ver por aqui! Conte comigo para o que precisar.',
-                            'Olá! Estou pronta para ajudar. O que gostaria de saber?',
-                            'Oi! Como posso assistir você hoje?'
+                            'Bom te ver por aqui! Conte comigo para o que precisar.'
                         ]
                     },
                     help: {
-                        patterns: ['ajuda', 'help', 'como funciona', 'o que você faz', 'recursos', 'comandos'],
+                        patterns: ['ajuda', 'help', 'como funciona', 'o que você faz'],
                         responses: [
                             'Posso ajudar com: responder perguntas, explicar conceitos, ajudar com problemas, conversar sobre diversos assuntos e muito mais!',
-                            'Sou uma IA baseada em rede neural especializada em compreensão contextual avançada.',
-                            'Meu objetivo é fornecer assistência inteligente e personalizada. Pergunte qualquer coisa!',
-                            'Posso ajudar em diversas áreas: tecnologia, ciência, educação, programação e muito mais.',
-                            'Estou aqui para ajudar com informações, explicações e conversas inteligentes.'
+                            'Sou uma IA especializada em compreensão contextual avançada. Posso ajudar com dúvidas, discussões e tarefas complexas.',
+                            'Meu objetivo é fornecer assistência inteligente e personalizada. Pergunte qualquer coisa!'
                         ]
                     },
                     technology: {
-                        patterns: ['tecnologia', 'programação', 'código', 'desenvolvimento', 'web', 'app', 'software', 'html', 'css', 'javascript', 'python', 'java'],
+                        patterns: ['tecnologia', 'programação', 'código', 'desenvolvimento', 'web', 'app'],
                         responses: [
                             'A tecnologia moderna evolui rapidamente! Posso discutir linguagens de programação, frameworks, arquitetura de software e tendências.',
                             'No desenvolvimento, é crucial manter-se atualizado. Posso ajudar com conceitos de programação e melhores práticas.',
-                            'A área tech está em constante evolução. Posso explicar conceitos complexos de forma simples.',
-                            'Interessante! Desenvolvimento de software é uma área fascinante. Posso ajudar com dúvidas específicas?',
-                            'A programação é como uma linguagem universal para resolver problemas. Posso ajudar com alguma linguagem em específico?'
-                        ]
-                    },
-                    science: {
-                        patterns: ['ciência', 'científico', 'pesquisa', 'experimento', 'descoberta', 'inovação'],
-                        responses: [
-                            'A ciência é a busca pela compreensão do universo. Posso discutir diversos tópicos científicos.',
-                            'Interessante! A ciência está sempre evoluindo com novas descobertas. Sobre qual área gostaria de conversar?',
-                            'A metodologia científica nos ajuda a entender o mundo de forma sistemática. Posso explicar algum conceito?'
-                        ]
-                    },
-                    questions: {
-                        patterns: ['?', 'por que', 'como', 'quando', 'onde', 'qual', 'quem', 'o que'],
-                        responses: [
-                            'Excelente pergunta! Deixe-me explicar isso detalhadamente.',
-                            'Interessante questão! Vou abordar isso de forma clara e completa.',
-                            'Boa pergunta! Aqui está uma explicação abrangente sobre o assunto.',
-                            'Vou responder sua dúvida com informações precisas e úteis.'
-                        ]
-                    },
-                    problems: {
-                        patterns: ['problema', 'erro', 'bug', 'não funciona', 'consertar', 'corrigir', 'solução'],
-                        responses: [
-                            'Entendo o problema. Vou ajudar a encontrar uma solução.',
-                            'Parece que há uma questão técnica. Vamos resolver isso juntos.',
-                            'Problemas são oportunidades de aprendizado! Vou ajudar a solucionar.',
-                            'Deixe-me analisar o problema e sugerir algumas soluções.'
+                            'A área tech está em constante evolução. Posso explicar conceitos complexos de forma simples.'
                         ]
                     },
                     general: {
                         patterns: ['*'],
                         responses: [
-                            'Interessante! Vou compartilhar algumas informações sobre isso.',
-                            'Sobre esse assunto, posso oferecer algumas perspectivas úteis.',
-                            'Vou elaborar um pouco mais sobre esse tópico interessante.',
-                            'Compreendo. Deixe-me expandir um pouco essa discussão.'
+                            'Interessante! Baseando-me no contexto atual, posso dizer que isso é um tópico fascinante.',
+                            'Compreendo sua perspectiva. Deixe-me elaborar um pouco sobre esse assunto.',
+                            'Excelente ponto! Isso me faz pensar em vários aspectos relacionados.',
+                            'Baseado no que sei, posso oferecer algumas insights sobre isso.'
                         ]
                     }
                 };
             }
 
-            async processInput(input, context = []) {
-                // Add to conversation memory
-                this.conversationMemory.push({
-                    user: input,
-                    timestamp: Date.now(),
-                    type: 'user'
-                });
-
-                // Keep memory manageable
-                if (this.conversationMemory.length > 20) {
-                    this.conversationMemory = this.conversationMemory.slice(-10);
-                }
-
-                // Enhanced pattern matching with neural network assistance
-                const response = await this.generateResponse(input, context);
-                
-                // Add AI response to memory
-                this.conversationMemory.push({
-                    ai: response,
-                    timestamp: Date.now(),
-                    type: 'ai'
-                });
-
-                return response;
-            }
-
-            async generateResponse(input, context) {
-                try {
-                    // First try neural network generation if model is loaded
-                    if (this.isModelLoaded) {
-                        const nnResponse = await this.neuralResponse(input, context);
-                        if (nnResponse && nnResponse.length > 10) {
-                            return nnResponse;
-                        }
-                    }
-
-                    // Fallback to knowledge-based response
-                    return this.knowledgeBasedResponse(input, context);
-                } catch (error) {
-                    console.error('Error generating response:', error);
-                    return this.knowledgeBasedResponse(input, context);
-                }
-            }
-
-            async neuralResponse(input, context) {
-                // Simple neural-inspired response generation
-                // In a real implementation, this would use the trained model
-                
-                const tokens = this.tokenize(input);
-                const inputTensor = tf.tensor2d([tokens]);
-                
-                // Mock prediction (in real implementation, use model.predict)
-                const responseTemplates = [
-                    "Com base na sua pergunta, posso oferecer algumas informações sobre isso. ",
-                    "Interessante questão! Vou compartilhar meu entendimento sobre o assunto. ",
-                    "Baseado no contexto da nossa conversa, aqui está o que posso dizer sobre isso. ",
-                    "Analisando sua pergunta, posso fornecer algumas perspectivas relevantes. "
-                ];
-                
-                const randomTemplate = responseTemplates[Math.floor(Math.random() * responseTemplates.length)];
-                
-                // Clean up tensors
-                inputTensor.dispose();
-                
-                return randomTemplate + this.generateInsightfulContent(input);
-            }
-
-            generateInsightfulContent(input) {
-                const insights = [
-                    "Este é um tópico fascinante que conecta vários campos do conhecimento. ",
-                    "Há pesquisas recentes que mostram aspectos interessantes sobre isso. ",
-                    "Do ponto de vista técnico, existem várias abordagens possíveis. ",
-                    "Na minha análise, considero que existem múltiplas perspectivas válidas. ",
-                    "Baseado em dados públicos e conhecimento atual, posso afirmar que há evidências consistentes. "
-                ];
-                
-                const actions = [
-                    "Posso elaborar mais se você tiver interesse em algum aspecto específico.",
-                    "Se quiser, posso fornecer mais detalhes técnicos sobre isso.",
-                    "Há recursos adicionais que posso recomendar se você quiser se aprofundar.",
-                    "Posso conectar isso com outros tópicos relacionados se for do seu interesse."
-                ];
-                
-                return insights[Math.floor(Math.random() * insights.length)] + 
-                       actions[Math.floor(Math.random() * actions.length)];
-            }
-
-            knowledgeBasedResponse(input, context) {
+            processInput(input, context = []) {
                 const normalizedInput = input.toLowerCase().trim();
+                this.conversationContext.push({ user: input, timestamp: Date.now() });
                 
-                // Enhanced pattern matching with context awareness
-                let bestMatch = null;
-                let highestScore = 0;
+                // Keep only last 10 messages in context
+                if (this.conversationContext.length > 10) {
+                    this.conversationContext.shift();
+                }
 
+                // Pattern matching with context awareness
                 for (const [category, data] of Object.entries(this.knowledgeBase)) {
                     for (const pattern of data.patterns) {
-                        if (pattern === '*') continue;
-                        
-                        let score = 0;
-                        if (normalizedInput.includes(pattern)) {
-                            score = pattern.length;
-                            
-                            // Context bonus
-                            if (context.length > 0) {
-                                const lastContext = context[context.length - 1].text.toLowerCase();
-                                if (lastContext.includes(pattern)) {
-                                    score += 5;
-                                }
-                            }
-                            
-                            // Category priority
-                            if (category === 'questions') score += 3;
-                            if (category === 'problems') score += 2;
-                            
-                            if (score > highestScore) {
-                                highestScore = score;
-                                bestMatch = category;
-                            }
+                        if (pattern === '*' || normalizedInput.includes(pattern)) {
+                            const response = this.selectResponse(data.responses, context);
+                            return this.enhanceResponse(response, normalizedInput, context);
                         }
                     }
                 }
 
-                // If no specific match found, use general
-                if (!bestMatch) {
-                    bestMatch = 'general';
-                }
-
-                // Select response with variety
-                const responses = this.knowledgeBase[bestMatch].responses;
-                let response = responses[Math.floor(Math.random() * responses.length)];
-                
-                // Personalize response
-                response = this.personalizeResponse(response, context);
-                
-                return response;
+                // Default intelligent response
+                return this.generateContextualResponse(normalizedInput, context);
             }
 
-            personalizeResponse(response, context) {
-                let personalized = response;
+            selectResponse(responses, context) {
+                // Simple neural-inspired selection based on context
+                const contextScore = this.analyzeContext(context);
+                const index = Math.floor(contextScore * responses.length) % responses.length;
+                return responses[index];
+            }
+
+            analyzeContext(context) {
+                if (context.length === 0) return Math.random();
+                
+                // Simple context analysis (can be enhanced)
+                let score = 0;
+                context.forEach(msg => {
+                    score += msg.text.length * 0.001; // Longer messages might be more important
+                });
+                return Math.min(score, 1);
+            }
+
+            enhanceResponse(response, input, context) {
+                // Add personalization and context awareness
+                let enhanced = response;
                 
                 // Add user name if available
                 if (currentUser) {
-                    personalized = personalized.replace(/você/g, currentUser);
+                    enhanced = enhanced.replace(/você/g, currentUser);
                 }
-                
-                // Add context if available
-                if (context.length > 0 && Math.random() > 0.4) {
-                    const contextualPhrases = [
-                        " Continuando nossa discussão anterior, ",
-                        " Desenvolvendo esse pensamento, ",
-                        " Baseado no que conversamos, ",
-                        " Expandindo esse tema, "
-                    ];
-                    const phrase = contextualPhrases[Math.floor(Math.random() * contextualPhrases.length)];
-                    personalized += phrase + this.getContextualAddition();
+
+                // Add contextual references
+                if (context.length > 0) {
+                    const lastUserMessage = context[context.length - 1];
+                    if (lastUserMessage && lastUserMessage.sender !== 'GabrIA') {
+                        enhanced += ` Continuando nosso diálogo anterior, ${this.getContextualPhrase()}`;
+                    }
                 }
-                
-                return personalized;
+
+                // Add intelligent follow-up
+                enhanced += ` ${this.getFollowUpQuestion(input)}`;
+
+                return enhanced;
             }
 
-            getContextualAddition() {
-                const additions = [
-                    "existem aspectos adicionais que valem a pena considerar.",
-                    "podemos explorar diferentes ângulos dessa questão.",
-                    "há relações interessantes com outros tópicos.",
-                    "isso conecta-se com conceitos fundamentais em várias áreas."
+            getContextualPhrase() {
+                const phrases = [
+                    'gostaria de aprofundar mais nesse assunto.',
+                    'existem aspectos adicionais que podemos explorar.',
+                    'isso conecta-se com vários outros tópicos interessantes.',
+                    'posso oferecer mais detalhes se desejar.'
                 ];
-                return additions[Math.floor(Math.random() * additions.length)];
+                return phrases[Math.floor(Math.random() * phrases.length)];
             }
 
-            async trainOnNewData(newData) {
-                // Simple online learning mechanism
-                // In a real implementation, this would update the model weights
-                console.log('Training on new data:', newData);
-                
-                // Update knowledge base with new patterns
-                if (newData.patterns && newData.responses) {
-                    // Find or create category
-                    let category = 'general';
-                    if (newData.category) {
-                        category = newData.category;
-                        if (!this.knowledgeBase[category]) {
-                            this.knowledgeBase[category] = { patterns: [], responses: [] };
-                        }
-                    }
-                    
-                    // Add new patterns and responses
-                    this.knowledgeBase[category].patterns.push(...newData.patterns);
-                    this.knowledgeBase[category].responses.push(...newData.responses);
+            getFollowUpQuestion(input) {
+                const questions = [
+                    'Há algo específico que gostaria de saber mais?',
+                    'Posso ajudar com algum outro aspecto relacionado?',
+                    'O que mais despertou seu interesse sobre isso?',
+                    'Gostaria que eu elaborasse em algum ponto específico?'
+                ];
+                return questions[Math.floor(Math.random() * questions.length)];
+            }
+
+            generateContextualResponse(input, context) {
+                // Advanced response generation based on input analysis
+                const words = input.split(' ');
+                const wordCount = words.length;
+                const hasQuestion = input.includes('?') || input.includes('como') || input.includes('porque') || input.includes('qual');
+
+                if (hasQuestion) {
+                    return `Excelente pergunta! Baseando-me no contexto atual e no conhecimento disponível, posso dizer que ${this.generateAnswer(words)}. Gostaria de mais detalhes?`;
+                } else if (wordCount > 8) {
+                    return `Compreendo sua perspectiva sobre "${input.substring(0, 50)}...". Isso é realmente interessante porque ${this.generateInsight(words)}. O que você acha?`;
+                } else {
+                    return `Interessante! "${input}". Isso me faz pensar que ${this.generateReflection(words)}. Podemos explorar mais esse tema?`;
                 }
             }
 
-            async fetchExternalKnowledge(query) {
-                try {
-                    // Simulate fetching knowledge from public APIs
-                    // In a real implementation, this would call actual APIs
-                    const mockKnowledge = {
-                        'tecnologia': 'A tecnologia está em constante evolução, com avanços em IA, computação quântica e biotecnologia liderando as inovações atuais.',
-                        'ciência': 'A ciência moderna avança através do método científico, com descobertas recentes em genética, astronomia e ciência de dados.',
-                        'programação': 'A programação envolve escrever instruções para computadores usando linguagens como Python, JavaScript e Java, seguindo princípios de clean code e arquitetura de software.',
-                        'educação': 'A educação está se transformando com tecnologias digitais, aprendizagem personalizada e enfoque em habilidades do século 21 como pensamento crítico e colaboração.'
-                    };
-                    
-                    return mockKnowledge[query.toLowerCase()] || 'Encontrei informações relevantes sobre esse tópico em bancos de dados públicos. Posso elaborar mais se você quiser.';
-                } catch (error) {
-                    console.error('Error fetching external knowledge:', error);
-                    return 'Não consegui acessar bancos de dados externos no momento, mas posso ajudar com meu conhecimento interno.';
+            generateAnswer(words) {
+                const topics = words.filter(word => word.length > 3);
+                const mainTopic = topics[Math.floor(Math.random() * topics.length)] || 'esse assunto';
+                return `existem várias perspectivas sobre ${mainTopic} que valem a pena considerar, cada uma com suas particularidades e aplicações`;
+            }
+
+            generateInsight(words) {
+                const insights = [
+                    'existem múltiplas camadas de significado que podemos explorar',
+                    'isso conecta-se com conceitos fundamentais em várias áreas',
+                    'a complexidade desse tópico revela padrões interessantes',
+                    'essa discussão pode levar a compreensões mais profundas'
+                ];
+                return insights[Math.floor(Math.random() * insights.length)];
+            }
+
+            generateReflection(words) {
+                const reflections = [
+                    'existem relações fascinantes com outros conceitos',
+                    'podemos aprender muito analisando isso de diferentes ângulos',
+                    'isso demonstra a riqueza do conhecimento humano',
+                    'cada perspectiva oferece insights valiosos'
+                ];
+                return reflections[Math.floor(Math.random() * reflections.length)];
+            }
+
+            learnFromInteraction(input, response, userFeedback) {
+                // Simple learning mechanism
+                if (userFeedback === 'positive') {
+                    // Reinforce successful patterns
+                    console.log('GabrIA: Aprendendo com feedback positivo');
                 }
+                // Can be enhanced with more sophisticated learning algorithms
             }
         }
 
-        // Initialize Professional Neural Network
-        const professionalAI = new ProfessionalNeuralNetwork();
-
-        // Initialize the neural network when the page loads
-        window.addEventListener('load', async () => {
-            try {
-                await professionalAI.initializeModel();
-                console.log('Professional AI Neural Network loaded successfully');
-                
-                // Add loading indicator
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'ai-loading';
-                loadingDiv.innerHTML = `
-                    <div class="ai-loading-spinner"></div>
-                    <div class="ai-loading-text">Rede Neural Profissional Carregada</div>
-                `;
-                document.body.appendChild(loadingDiv);
-                
-                // Remove loading indicator after 3 seconds
-                setTimeout(() => {
-                    loadingDiv.remove();
-                }, 3000);
-            } catch (error) {
-                console.error('Failed to initialize neural network:', error);
-            }
-        });
-
-        // Sistema de mensagens que se autodestroem
-        function initializeSelfDestructSystem() {
-            // Verificar e remover mensagens antigas que deveriam ter se autodestruído
-            database.ref('messages').once('value', (snapshot) => {
-                const updates = {};
-                const now = Date.now();
-                
-                snapshot.forEach((childSnapshot) => {
-                    const message = childSnapshot.val();
-                    const messageId = childSnapshot.key;
-                    
-                    // Se é uma mensagem que se autodestrói e já passou do tempo
-                    if (message.selfDestruct && message.timestamp && (now - message.timestamp > 10000)) {
-                        updates[messageId] = null;
-                    }
-                });
-                
-                if (Object.keys(updates).length > 0) {
-                    database.ref('messages').update(updates);
-                }
-            });
-
-            // Configurar um intervalo para limpar mensagens autodestrutivas
-            setInterval(() => {
-                database.ref('messages').once('value', (snapshot) => {
-                    const updates = {};
-                    const now = Date.now();
-                    
-                    snapshot.forEach((childSnapshot) => {
-                        const message = childSnapshot.val();
-                        const messageId = childSnapshot.key;
-                        
-                        if (message.selfDestruct && message.timestamp && (now - message.timestamp > 10000)) {
-                            updates[messageId] = null;
-                        }
-                    });
-                    
-                    if (Object.keys(updates).length > 0) {
-                        database.ref('messages').update(updates);
-                    }
-                });
-            }, 5000);
-        }
+        // Initialize GabrIA
+        const gabrIA = new GabrIANeuralNetwork();
 
         // Password check
         unlockBtn.addEventListener('click', unlockChat);
@@ -1675,15 +1339,9 @@
                 // Update online users count
                 updateOnlineUsers();
 
-                // Inicializar sistema de autodestruição
-                setTimeout(() => {
-                    initializeSelfDestructSystem();
-                }, 2000);
-
                 // Add welcome message
                 setTimeout(() => {
-                    addMessageToFirebase('Sistema', `Bem-vindo(a), ${currentUser}! Você agora está conectado(a) ao Chat Global com IA Profissional.`, 'text');
-                    addMessageToFirebase('Sistema', `Recursos disponíveis:\n• @GabrIA - Rede Neural Profissional\n• @ChatGPT - Assistente geral\n• Mensagens secretas (10s)\n• Personalização completa`, 'text');
+                    addMessageToFirebase('Sistema', `Bem-vindo(a), ${currentUser}! Você agora está conectado(a) ao Chat Global. Use @ para mencionar usuários e @GabrIA para falar com nossa IA especializada.`, 'text');
                 }, 1000);
             } else {
                 alert('Credenciais inválidas! Verifique seu nome de usuário e senha.');
@@ -1824,6 +1482,7 @@
             if (!customizationSettings.linkPreview) return null;
             
             try {
+                // Simple link preview (in a real app, you'd use a proper API)
                 return {
                     title: 'Link compartilhado',
                     description: `Conteúdo de ${new URL(url).hostname}`,
@@ -1864,25 +1523,11 @@
                     // Show GabrIA typing
                     showAITyping('GabrIA');
                     
-                    // Process with Professional AI
+                    // Process with GabrIA
                     setTimeout(async () => {
                         removeAITyping();
-                        try {
-                            const response = await professionalAI.processInput(question, getRecentMessages());
-                            addMessageToFirebase('GabrIA', response, 'text', true);
-                            
-                            // Fetch external knowledge for enrichment
-                            setTimeout(async () => {
-                                const externalKnowledge = await professionalAI.fetchExternalKnowledge(question);
-                                if (externalKnowledge && !externalKnowledge.includes('Não consegui acessar')) {
-                                    addMessageToFirebase('GabrIA', `💡 Informação adicional: ${externalKnowledge}`, 'text', true);
-                                }
-                            }, 1000);
-                            
-                        } catch (error) {
-                            console.error('Error processing with AI:', error);
-                            addMessageToFirebase('GabrIA', 'Desculpe, encontrei um problema. Vou tentar novamente.', 'text', true);
-                        }
+                        const response = await gabrIA.processInput(question, getRecentMessages());
+                        addMessageToFirebase('GabrIA', response, 'text', true);
                     }, 2000);
                 }
             } else if (messageText.toLowerCase().includes('@chatgpt')) {
@@ -1903,12 +1548,10 @@
             messageInput.value = '';
             selfDestructMode = false;
             selfDestructBtn.classList.remove('active');
-            selfDestructBtn.style.background = '';
-            selfDestructBtn.style.color = '';
-            messageInput.placeholder = "Digite uma mensagem... @ para mencionar";
         }
 
         function getRecentMessages() {
+            // Get recent messages for context (simplified)
             const messages = [];
             const messageElements = messagesContainer.querySelectorAll('.message');
             messageElements.forEach(el => {
@@ -1916,10 +1559,10 @@
                 const sender = el.classList.contains('sent') ? currentUser : 
                              el.querySelector('.message-content')?.textContent.includes('GabrIA') ? 'GabrIA' : 'Other';
                 if (content) {
-                    messages.push({ sender, text: content, timestamp: Date.now() });
+                    messages.push({ sender, text: content });
                 }
             });
-            return messages.slice(-5);
+            return messages.slice(-5); // Last 5 messages
         }
 
         function showAITyping(aiName) {
@@ -1933,13 +1576,13 @@
             
             typingDiv.innerHTML = `
                 <div class="ai-typing">
-                    ${aiName} está processando com rede neural
+                    ${aiName} está pensando
                     <div class="typing-dots">
                         <div class="typing-dot"></div>
                         <div class="typing-dot"></div>
                         <div class="typing-dot"></div>
                     </div>
-                    <span class="ai-badge">IA PROFISSIONAL</span>
+                    <span class="ai-badge">IA</span>
                 </div>
             `;
             typingDiv.id = `${aiName.toLowerCase()}-typing-indicator`;
@@ -1973,15 +1616,18 @@
             
             fileRef.put(file).then((snapshot) => {
                 snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    // Determine file type
                     let fileType = 'file';
                     if (file.type.startsWith('image/')) {
                         fileType = 'image';
                     }
                     
+                    // Add message with file to Firebase
                     addMessageToFirebase(currentUser, downloadURL, fileType, false, file.name, file.size);
                 });
             });
 
+            // Reset file input
             fileInput.value = '';
         }
 
@@ -1993,11 +1639,9 @@
             if (selfDestructMode) {
                 selfDestructBtn.style.background = '#ff5252';
                 selfDestructBtn.style.color = 'white';
-                messageInput.placeholder = "Mensagem secreta (some em 10s)...";
             } else {
                 selfDestructBtn.style.background = '';
                 selfDestructBtn.style.color = '';
-                messageInput.placeholder = "Digite uma mensagem... @ para mencionar";
             }
         });
 
@@ -2005,6 +1649,7 @@
         function setUserOnline() {
             userPresenceRef = database.ref('users/' + currentUser);
             
+            // Set user as online
             userPresenceRef.set({
                 name: currentUser,
                 online: true,
@@ -2012,6 +1657,7 @@
                 avatar: currentUser.charAt(0).toUpperCase()
             });
             
+            // Set user as offline when they disconnect
             userPresenceRef.onDisconnect().set({
                 name: currentUser,
                 online: false,
@@ -2059,6 +1705,7 @@
                 readBy: { [currentUser]: true }
             };
             
+            // Process links if it's a text message
             if (type === 'text') {
                 const links = extractLinks(content);
                 if (links.length > 0) {
@@ -2066,16 +1713,7 @@
                 }
             }
             
-            const messageRef = database.ref('messages').push(message);
-            const messageId = messageRef.key;
-            
-            if (selfDestructMode) {
-                setTimeout(() => {
-                    database.ref('messages/' + messageId).remove();
-                }, 10000);
-            }
-            
-            return messageId;
+            database.ref('messages').push(message);
         }
 
         // Load messages from Firebase
@@ -2087,7 +1725,10 @@
                     displayMessage(message, childSnapshot.key);
                 });
                 
+                // Scroll to bottom
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Mark messages as read
                 markMessagesAsRead();
             });
         }
@@ -2109,11 +1750,13 @@
 
             let messageContent = '';
             
+            // Process message content
             const processedContent = processMessageContent(message.content);
             
             if (message.type === 'text') {
                 messageContent += `<div class="message-content">${processedContent}</div>`;
                 
+                // Add link previews
                 if (message.links && customizationSettings.linkPreview) {
                     for (const link of message.links) {
                         const preview = await fetchLinkPreview(link);
@@ -2150,50 +1793,29 @@
                 `;
             }
             
+            // Add AI badge
             if (isAI) {
-                messageContent = messageContent.replace('</div>', `<span class="ai-badge">${message.originalSender === 'GabrIA' ? 'IA PROFISSIONAL' : 'IA'}</span></div>`);
+                messageContent = messageContent.replace('</div>', `<span class="ai-badge">IA</span></div>`);
             }
             
+            // Add self-destruct indicator
             if (message.selfDestruct) {
-                const timeLeft = 10000 - (Date.now() - message.timestamp);
-                if (timeLeft > 0) {
-                    messageContent += `
-                        <div class="self-destruct-indicator">
-                            <i class="fas fa-bomb"></i>
-                            Mensagem secreta - some em <span class="self-destruct-timer">${Math.ceil(timeLeft/1000)}s</span>
-                        </div>
-                    `;
-                    
-                    const timerElement = messageDiv.querySelector('.self-destruct-timer');
-                    const timerInterval = setInterval(() => {
-                        const updatedTimeLeft = 10000 - (Date.now() - message.timestamp);
-                        if (updatedTimeLeft > 0 && timerElement) {
-                            timerElement.textContent = `${Math.ceil(updatedTimeLeft/1000)}s`;
-                        } else {
-                            clearInterval(timerInterval);
-                        }
-                    }, 1000);
-                    
-                    setTimeout(() => {
-                        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
-                        if (messageElement) {
-                            messageElement.style.opacity = '0';
-                            setTimeout(() => {
-                                if (messageElement.parentNode) {
-                                    messageElement.remove();
-                                }
-                            }, 500);
-                        }
-                    }, timeLeft);
-                }
+                messageContent += `
+                    <div class="self-destruct-indicator">
+                        <i class="fas fa-bomb self-destruct-icon"></i>
+                        Mensagem secreta
+                    </div>
+                `;
             }
             
+            // Add timestamp
             messageContent += `
                 <div class="message-time">
                     ${formatTime(message.timestamp)}
                 </div>
             `;
             
+            // Add action buttons for user's own messages
             if (isSent) {
                 messageContent += `
                     <div class="message-actions">
@@ -2211,9 +1833,9 @@
             }
             
             messageDiv.innerHTML = messageContent;
-            messageDiv.setAttribute('data-message-id', messageId);
             messagesContainer.appendChild(messageDiv);
             
+            // Add delete functionality
             if (isSent) {
                 const deleteBtn = messageDiv.querySelector('.delete-btn');
                 deleteBtn.addEventListener('click', () => {
@@ -2221,6 +1843,7 @@
                 });
             }
             
+            // Add mention click functionality
             messageDiv.querySelectorAll('.mention').forEach(mention => {
                 mention.addEventListener('click', () => {
                     const username = mention.textContent.substring(1);
@@ -2278,8 +1901,8 @@
                     const messagesRef = database.ref('messages');
                     messagesRef.once('value', (snapshot) => {
                         if (!snapshot.exists()) {
-                            addMessageToFirebase('Sistema', 'Bem-vindo ao Chat Global com IA Profissional! 🧠', 'text');
-                            addMessageToFirebase('Sistema', 'Sistema de Rede Neural Carregado:\n• Modelo TensorFlow.js\n• Processamento de Linguagem Natural\n• Base de Conhecimento Expandida\n• Aprendizado Contínuo', 'text');
+                            addMessageToFirebase('Sistema', 'Bem-vindo ao Chat Global Avançado! 🚀', 'text');
+                            addMessageToFirebase('Sistema', 'Recursos disponíveis:\n• @GabrIA - IA especializada\n• @ChatGPT - Assistente geral\n• @usuário - Mencionar pessoas\n• Links com preview\n• Mensagens secretas\n• Personalização completa', 'text');
                         }
                     });
                 }
