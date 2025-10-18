@@ -43,6 +43,39 @@
             color: #e0e0e0;
         }
 
+        /* Novos temas */
+        body.theme-blue {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        }
+        
+        body.theme-green {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+        }
+        
+        body.theme-purple {
+            background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+        }
+        
+        body.theme-orange {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+        }
+        
+        body.theme-red {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+        }
+        
+        body.theme-pink {
+            background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+        }
+        
+        body.theme-dark-blue {
+            background: linear-gradient(135deg, #e3f2fd, #90caf9);
+        }
+        
+        body.theme-dark-green {
+            background: linear-gradient(135deg, #e8f5e9, #a5d6a7);
+        }
+
         .container {
             width: 90%;
             max-width: 1200px;
@@ -327,6 +360,47 @@
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%230d796c' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
         }
 
+        /* Indicador de digitação */
+        .typing-indicator {
+            padding: 8px 15px;
+            color: var(--text-light);
+            font-style: italic;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dark-theme .typing-indicator {
+            color: #aaa;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 2px;
+            margin-left: 5px;
+        }
+
+        .typing-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: var(--text-light);
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .dark-theme .typing-dot {
+            background-color: #aaa;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
         .message {
             max-width: 70%;
             padding: 12px 16px;
@@ -525,27 +599,6 @@
             gap: 5px;
             color: var(--text-light);
             font-style: italic;
-        }
-
-        .typing-dots {
-            display: flex;
-            gap: 2px;
-        }
-
-        .typing-dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background-color: var(--text-light);
-            animation: typing 1.4s infinite ease-in-out;
-        }
-
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-            40% { transform: scale(1); opacity: 1; }
         }
 
         /* Self Destruct Modal */
@@ -765,6 +818,9 @@
             display: flex;
             gap: 10px;
             z-index: 10;
+            flex-wrap: wrap;
+            max-width: 200px;
+            justify-content: flex-end;
         }
 
         .theme-option {
@@ -799,6 +855,22 @@
 
         .theme-orange {
             background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+        }
+
+        .theme-red {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+        }
+
+        .theme-pink {
+            background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+        }
+
+        .theme-dark-blue {
+            background: linear-gradient(135deg, #e3f2fd, #90caf9);
+        }
+
+        .theme-dark-green {
+            background: linear-gradient(135deg, #e8f5e9, #a5d6a7);
         }
 
         /* API Key Modal */
@@ -950,6 +1022,7 @@
                 width: 100%;
                 height: 100vh;
                 border-radius: 0;
+                flex-direction: column;
             }
             
             .sidebar {
@@ -957,13 +1030,66 @@
                 display: none;
             }
             
+            .sidebar.active {
+                display: flex;
+            }
+            
             .chat-area {
                 width: 100%;
+                display: none;
+            }
+            
+            .chat-area.active {
+                display: flex;
             }
             
             .message {
                 max-width: 85%;
             }
+            
+            .theme-selector {
+                top: 5px;
+                right: 5px;
+                gap: 5px;
+            }
+            
+            .theme-option {
+                width: 25px;
+                height: 25px;
+            }
+            
+            .mobile-nav {
+                display: flex;
+                background-color: var(--primary-color);
+                padding: 10px 15px;
+                justify-content: space-between;
+                align-items: center;
+                color: white;
+            }
+            
+            .mobile-nav-btn {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 18px;
+                cursor: pointer;
+            }
+            
+            .mobile-nav-title {
+                font-size: 16px;
+                font-weight: 500;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-nav {
+                display: none;
+            }
+        }
+        
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
         }
     </style>
 </head>
@@ -973,6 +1099,10 @@
         <div class="theme-option theme-green" data-theme="green"></div>
         <div class="theme-option theme-purple" data-theme="purple"></div>
         <div class="theme-option theme-orange" data-theme="orange"></div>
+        <div class="theme-option theme-red" data-theme="red"></div>
+        <div class="theme-option theme-pink" data-theme="pink"></div>
+        <div class="theme-option theme-dark-blue" data-theme="dark-blue"></div>
+        <div class="theme-option theme-dark-green" data-theme="dark-green"></div>
     </div>
 
     <!-- Self Destruct Modal -->
@@ -1037,8 +1167,19 @@
             </div>
         </div>
 
+        <!-- Mobile Navigation -->
+        <div class="mobile-nav">
+            <button class="mobile-nav-btn" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="mobile-nav-title">Chat Global</div>
+            <button class="mobile-nav-btn" id="mobileSettingsBtn">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+
         <!-- Sidebar -->
-        <div class="sidebar">
+        <div class="sidebar active" id="sidebar">
             <div class="user-profile">
                 <div class="user-details">
                     <div class="user-avatar" id="userAvatar">U</div>
@@ -1052,14 +1193,14 @@
                 </button>
             </div>
             <div class="chat-list">
-                <div class="chat-item active">
+                <div class="chat-item active" data-chat="global">
                     <div class="chat-avatar">GC</div>
                     <div class="chat-info">
                         <h4>Chat Global</h4>
                         <p id="onlineCount">Carregando...</p>
                     </div>
                 </div>
-                <div class="chat-item">
+                <div class="chat-item" data-chat="chatgpt">
                     <div class="chat-avatar">AI</div>
                     <div class="chat-info">
                         <h4>ChatGPT</h4>
@@ -1070,7 +1211,7 @@
         </div>
 
         <!-- Chat Area -->
-        <div class="chat-area">
+        <div class="chat-area active" id="chatArea">
             <div class="chat-header">
                 <div class="chat-header-info">
                     <h3>Chat Global</h3>
@@ -1086,6 +1227,16 @@
 
             <div class="messages-container" id="messagesContainer">
                 <!-- Messages will be dynamically added here -->
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                <span id="typingUsers"></span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
             </div>
 
             <!-- Reply Preview -->
@@ -1167,6 +1318,13 @@
         const closeSelfDestruct = document.getElementById('closeSelfDestruct');
         const countdownElement = document.getElementById('countdown');
         const hideNameToggle = document.getElementById('hideNameToggle');
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileSettingsBtn = document.getElementById('mobileSettingsBtn');
+        const sidebar = document.getElementById('sidebar');
+        const chatArea = document.getElementById('chatArea');
+        const chatItems = document.querySelectorAll('.chat-item');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const typingUsers = document.getElementById('typingUsers');
 
         // App State
         let currentUser = '';
@@ -1183,6 +1341,10 @@
         let hideName = localStorage.getItem('hide_name') === 'true';
         let countdownInterval;
         let currentSelfDestructMessage = null;
+        let typingTimeout;
+        let isTyping = false;
+        let currentChat = 'global';
+        let typingUsersList = {};
 
         // Proxy configurations
         const proxyConfigs = {
@@ -1260,6 +1422,19 @@
             apiKeyModal.style.display = 'flex';
         });
 
+        mobileSettingsBtn.addEventListener('click', () => {
+            apiKeyInput.value = openaiApiKey || '';
+            proxySelect.value = proxyType;
+            if (proxyType === 'custom') {
+                customProxyInput.style.display = 'block';
+                customProxyInput.value = customProxyUrl;
+            } else {
+                customProxyInput.style.display = 'none';
+            }
+            hideNameToggle.checked = hideName;
+            apiKeyModal.style.display = 'flex';
+        });
+
         // Self Destruct Modal handlers
         closeSelfDestruct.addEventListener('click', () => {
             selfDestructModal.style.display = 'none';
@@ -1273,6 +1448,67 @@
                 currentSelfDestructMessage = null;
             }
         });
+
+        // Mobile navigation
+        menuToggle.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('active');
+                chatArea.classList.toggle('active');
+            }
+        });
+
+        // Chat selection
+        chatItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                    chatArea.classList.add('active');
+                }
+                
+                chatItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                currentChat = item.getAttribute('data-chat');
+                updateChatHeader();
+                
+                // Clear messages container
+                messagesContainer.innerHTML = '';
+                
+                // Load messages for selected chat
+                if (currentChat === 'global') {
+                    loadMessages();
+                } else if (currentChat === 'chatgpt') {
+                    // Load ChatGPT messages or show instructions
+                    messagesContainer.innerHTML = `
+                        <div class="message received">
+                            <div class="message-content">
+                                Bem-vindo ao ChatGPT! Digite suas perguntas aqui e receba respostas da IA.
+                                <br><br>
+                                <strong>Como usar:</strong>
+                                <ul style="margin-left: 20px; margin-top: 5px;">
+                                    <li>Digite @chatgpt seguido da sua pergunta</li>
+                                    <li>Certifique-se de ter configurado sua chave de API nas configurações</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        });
+
+        // Update chat header based on selected chat
+        function updateChatHeader() {
+            const chatHeader = document.querySelector('.chat-header-info h3');
+            const chatStatus = document.querySelector('.chat-header-info p');
+            
+            if (currentChat === 'global') {
+                chatHeader.textContent = 'Chat Global';
+                chatStatus.textContent = `${usersOnline} online`;
+            } else if (currentChat === 'chatgpt') {
+                chatHeader.textContent = 'ChatGPT';
+                chatStatus.textContent = 'Assistente de IA';
+            }
+        }
 
         // Password check
         unlockBtn.addEventListener('click', unlockChat);
@@ -1300,6 +1536,9 @@
                 
                 // Update online users count
                 updateOnlineUsers();
+                
+                // Listen for typing indicators
+                listenForTyping();
             } else {
                 alert('Senha incorreta ou nome de usuário vazio! Tente novamente.');
                 passwordInput.value = '';
@@ -1334,7 +1573,7 @@
                 option.classList.add('active');
                 
                 // Remove all theme classes from body
-                document.body.classList.remove('theme-blue', 'theme-green', 'theme-purple', 'theme-orange');
+                document.body.classList.remove('theme-blue', 'theme-green', 'theme-purple', 'theme-orange', 'theme-red', 'theme-pink', 'theme-dark-blue', 'theme-dark-green');
                 // Add selected theme class
                 document.body.classList.add(`theme-${theme}`);
             });
@@ -1358,6 +1597,71 @@
             replyPreview.style.display = 'none';
         });
 
+        // Typing indicator functionality
+        messageInput.addEventListener('input', () => {
+            if (!isTyping) {
+                isTyping = true;
+                // Set user as typing in Firebase
+                database.ref('typing/' + currentUser).set({
+                    name: currentUser,
+                    timestamp: Date.now()
+                });
+            }
+            
+            // Clear existing timeout
+            clearTimeout(typingTimeout);
+            
+            // Set timeout to stop typing after 1 second of inactivity
+            typingTimeout = setTimeout(() => {
+                isTyping = false;
+                // Remove user from typing in Firebase
+                database.ref('typing/' + currentUser).remove();
+            }, 1000);
+        });
+
+        // Listen for typing indicators from other users
+        function listenForTyping() {
+            database.ref('typing').on('value', (snapshot) => {
+                const typingData = snapshot.val();
+                typingUsersList = {};
+                
+                if (typingData) {
+                    const currentTime = Date.now();
+                    Object.keys(typingData).forEach(userId => {
+                        // Only show users who typed in the last 3 seconds
+                        if (currentTime - typingData[userId].timestamp < 3000 && userId !== currentUser) {
+                            typingUsersList[userId] = typingData[userId].name;
+                        }
+                    });
+                }
+                
+                updateTypingIndicator();
+            });
+        }
+
+        // Update typing indicator display
+        function updateTypingIndicator() {
+            const typingUsersCount = Object.keys(typingUsersList).length;
+            
+            if (typingUsersCount > 0) {
+                let userNames = Object.values(typingUsersList);
+                let displayText = '';
+                
+                if (typingUsersCount === 1) {
+                    displayText = `${userNames[0]} está digitando`;
+                } else if (typingUsersCount === 2) {
+                    displayText = `${userNames[0]} e ${userNames[1]} estão digitando`;
+                } else {
+                    displayText = `${userNames[0]}, ${userNames[1]} e mais ${typingUsersCount - 2} estão digitando`;
+                }
+                
+                typingUsers.textContent = displayText;
+                typingIndicator.style.display = 'flex';
+            } else {
+                typingIndicator.style.display = 'none';
+            }
+        }
+
         // Send message
         sendBtn.addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', (e) => {
@@ -1376,16 +1680,25 @@
             const messageText = messageInput.value.trim();
             if (messageText === '') return;
 
+            // Remove typing indicator
+            if (isTyping) {
+                isTyping = false;
+                database.ref('typing/' + currentUser).remove();
+                clearTimeout(typingTimeout);
+            }
+
             // Check if it's a ChatGPT request
-            if (messageText.startsWith('@chatgpt')) {
+            if (currentChat === 'chatgpt' || messageText.startsWith('@chatgpt')) {
                 if (!openaiApiKey) {
                     alert('Por favor, configure a chave de API do OpenAI primeiro clicando no ícone de configurações.');
                     return;
                 }
                 
-                const question = messageText.replace('@chatgpt', '').trim();
+                const question = messageText.startsWith('@chatgpt') ? 
+                    messageText.replace('@chatgpt', '').trim() : messageText;
+                
                 if (question === '') {
-                    alert('Por favor, digite uma pergunta após @chatgpt');
+                    alert('Por favor, digite uma pergunta');
                     return;
                 }
 
@@ -1644,7 +1957,8 @@
                 replyTo: replyTo,
                 selfDestruct: selfDestruct,
                 viewers: {},
-                readBy: { [currentUser]: true }
+                readBy: { [currentUser]: true },
+                chat: currentChat
             };
             
             database.ref('messages').push(message);
@@ -1656,7 +1970,10 @@
                 messagesContainer.innerHTML = '';
                 snapshot.forEach((childSnapshot) => {
                     const message = childSnapshot.val();
-                    displayMessage(message, childSnapshot.key);
+                    // Only display messages for the current chat
+                    if (message.chat === currentChat || (currentChat === 'global' && !message.chat)) {
+                        displayMessage(message, childSnapshot.key);
+                    }
                 });
                 
                 // Scroll to bottom
@@ -1926,6 +2243,11 @@
                     online: false,
                     lastSeen: Date.now()
                 });
+            }
+            
+            // Remove typing indicator
+            if (isTyping) {
+                database.ref('typing/' + currentUser).remove();
             }
         });
     </script>
