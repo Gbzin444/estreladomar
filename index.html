@@ -1016,7 +1016,7 @@
             color: #e0e0e0;
         }
 
-        /* Responsive Design */
+        /* MOBILE RESPONSIVE - CORREÇÕES */
         @media (max-width: 768px) {
             .container {
                 width: 100%;
@@ -1028,6 +1028,9 @@
             .sidebar {
                 width: 100%;
                 display: none;
+                position: absolute;
+                z-index: 10;
+                height: 100%;
             }
             
             .sidebar.active {
@@ -1036,7 +1039,7 @@
             
             .chat-area {
                 width: 100%;
-                display: none;
+                height: 100%;
             }
             
             .chat-area.active {
@@ -1065,6 +1068,8 @@
                 justify-content: space-between;
                 align-items: center;
                 color: white;
+                position: relative;
+                z-index: 5;
             }
             
             .mobile-nav-btn {
@@ -1073,11 +1078,40 @@
                 color: white;
                 font-size: 18px;
                 cursor: pointer;
+                padding: 8px;
             }
             
             .mobile-nav-title {
                 font-size: 16px;
                 font-weight: 500;
+            }
+            
+            /* Melhorias para visualização mobile */
+            .user-profile {
+                padding: 15px;
+            }
+            
+            .chat-item {
+                padding: 12px 15px;
+            }
+            
+            .message-input-container {
+                padding: 10px 15px;
+            }
+            
+            .messages-container {
+                padding: 15px;
+            }
+            
+            /* Ajustes para melhor usabilidade em telas menores */
+            .self-destruct-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
             }
         }
         
@@ -1179,7 +1213,7 @@
         </div>
 
         <!-- Sidebar -->
-        <div class="sidebar active" id="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="user-profile">
                 <div class="user-details">
                     <div class="user-avatar" id="userAvatar">U</div>
@@ -1221,7 +1255,9 @@
                     <button class="chat-action-btn" id="settingsBtn">
                         <i class="fas fa-cog"></i>
                     </button>
-                    <button class="chat-action-btn"><i class="fas fa-ellipsis-v"></i></button>
+                    <button class="chat-action-btn" id="backToChatsBtn" style="display: none;">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
                 </div>
             </div>
 
@@ -1325,6 +1361,7 @@
         const chatItems = document.querySelectorAll('.chat-item');
         const typingIndicator = document.getElementById('typingIndicator');
         const typingUsers = document.getElementById('typingUsers');
+        const backToChatsBtn = document.getElementById('backToChatsBtn');
 
         // App State
         let currentUser = '';
@@ -1345,6 +1382,7 @@
         let isTyping = false;
         let currentChat = 'global';
         let typingUsersList = {};
+        let currentTheme = localStorage.getItem('currentTheme') || 'blue';
 
         // Proxy configurations
         const proxyConfigs = {
@@ -1355,6 +1393,125 @@
             'custom': customProxyUrl
         };
 
+        // Inicialização dos temas
+        function initializeThemes() {
+            // Aplicar tema salvo
+            applyTheme(currentTheme);
+            
+            // Configurar eventos para os seletores de tema
+            themeOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const theme = option.getAttribute('data-theme');
+                    applyTheme(theme);
+                    
+                    // Salvar tema selecionado
+                    localStorage.setItem('currentTheme', theme);
+                    currentTheme = theme;
+                });
+            });
+        }
+        
+        // Aplicar tema selecionado
+        function applyTheme(theme) {
+            // Remover todas as classes de tema do body
+            document.body.classList.remove('theme-blue', 'theme-green', 'theme-purple', 'theme-orange', 
+                                         'theme-red', 'theme-pink', 'theme-dark-blue', 'theme-dark-green');
+            
+            // Adicionar classe do tema selecionado
+            document.body.classList.add(`theme-${theme}`);
+            
+            // Atualizar seleção visual
+            themeOptions.forEach(option => {
+                option.classList.remove('active');
+                if (option.getAttribute('data-theme') === theme) {
+                    option.classList.add('active');
+                }
+            });
+        }
+
+        // Configurações de navegação mobile
+        function initializeMobileNavigation() {
+            // Botão de menu para mostrar/ocultar sidebar
+            menuToggle.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('active');
+                    chatArea.classList.toggle('active');
+                    
+                    // Mostrar/ocultar botão de voltar
+                    if (sidebar.classList.contains('active')) {
+                        backToChatsBtn.style.display = 'none';
+                    } else {
+                        backToChatsBtn.style.display = 'block';
+                    }
+                }
+            });
+            
+            // Botão de voltar para chats
+            backToChatsBtn.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.add('active');
+                    chatArea.classList.remove('active');
+                    backToChatsBtn.style.display = 'none';
+                }
+            });
+            
+            // Ao selecionar um chat no mobile
+            chatItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        // No mobile, esconder sidebar e mostrar área de chat
+                        sidebar.classList.remove('active');
+                        chatArea.classList.add('active');
+                        backToChatsBtn.style.display = 'block';
+                    }
+                    
+                    // Atualizar seleção de chat
+                    chatItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    currentChat = item.getAttribute('data-chat');
+                    updateChatHeader();
+                    
+                    // Limpar e carregar mensagens
+                    messagesContainer.innerHTML = '';
+                    
+                    if (currentChat === 'global') {
+                        loadMessages();
+                    } else if (currentChat === 'chatgpt') {
+                        // Mostrar instruções do ChatGPT
+                        messagesContainer.innerHTML = `
+                            <div class="message received">
+                                <div class="message-content">
+                                    Bem-vindo ao ChatGPT! Digite suas perguntas aqui e receba respostas da IA.
+                                    <br><br>
+                                    <strong>Como usar:</strong>
+                                    <ul style="margin-left: 20px; margin-top: 5px;">
+                                        <li>Digite @chatgpt seguido da sua pergunta</li>
+                                        <li>Certifique-se de ter configurado sua chave de API nas configurações</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            });
+            
+            // Ajustar navegação ao redimensionar a tela
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    // Em telas maiores, mostrar ambos os painéis
+                    sidebar.classList.add('active');
+                    chatArea.classList.add('active');
+                    backToChatsBtn.style.display = 'none';
+                } else {
+                    // Em telas menores, mostrar apenas a área de chat por padrão
+                    sidebar.classList.remove('active');
+                    chatArea.classList.add('active');
+                    backToChatsBtn.style.display = 'block';
+                }
+            });
+        }
+
         // Initialize settings
         proxySelect.value = proxyType;
         if (proxyType === 'custom') {
@@ -1362,6 +1519,10 @@
             customProxyInput.value = customProxyUrl;
         }
         hideNameToggle.checked = hideName;
+
+        // Inicializar temas e navegação mobile
+        initializeThemes();
+        initializeMobileNavigation();
 
         // Proxy selection handler
         proxySelect.addEventListener('change', function() {
@@ -1449,53 +1610,6 @@
             }
         });
 
-        // Mobile navigation
-        menuToggle.addEventListener('click', () => {
-            if (window.innerWidth <= 768) {
-                sidebar.classList.toggle('active');
-                chatArea.classList.toggle('active');
-            }
-        });
-
-        // Chat selection
-        chatItems.forEach(item => {
-            item.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('active');
-                    chatArea.classList.add('active');
-                }
-                
-                chatItems.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                
-                currentChat = item.getAttribute('data-chat');
-                updateChatHeader();
-                
-                // Clear messages container
-                messagesContainer.innerHTML = '';
-                
-                // Load messages for selected chat
-                if (currentChat === 'global') {
-                    loadMessages();
-                } else if (currentChat === 'chatgpt') {
-                    // Load ChatGPT messages or show instructions
-                    messagesContainer.innerHTML = `
-                        <div class="message received">
-                            <div class="message-content">
-                                Bem-vindo ao ChatGPT! Digite suas perguntas aqui e receba respostas da IA.
-                                <br><br>
-                                <strong>Como usar:</strong>
-                                <ul style="margin-left: 20px; margin-top: 5px;">
-                                    <li>Digite @chatgpt seguido da sua pergunta</li>
-                                    <li>Certifique-se de ter configurado sua chave de API nas configurações</li>
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-        });
-
         // Update chat header based on selected chat
         function updateChatHeader() {
             const chatHeader = document.querySelector('.chat-header-info h3');
@@ -1561,23 +1675,6 @@
                 icon.classList.add('fa-moon');
             }
         }
-
-        // Background theme selection
-        themeOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                const theme = option.getAttribute('data-theme');
-                
-                // Remove active class from all options
-                themeOptions.forEach(opt => opt.classList.remove('active'));
-                // Add active class to clicked option
-                option.classList.add('active');
-                
-                // Remove all theme classes from body
-                document.body.classList.remove('theme-blue', 'theme-green', 'theme-purple', 'theme-orange', 'theme-red', 'theme-pink', 'theme-dark-blue', 'theme-dark-green');
-                // Add selected theme class
-                document.body.classList.add(`theme-${theme}`);
-            });
-        });
 
         // Self-destruct mode toggle
         selfDestructBtn.addEventListener('click', () => {
