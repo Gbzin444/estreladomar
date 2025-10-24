@@ -1016,6 +1016,154 @@
             color: #e0e0e0;
         }
 
+        /* NOTIFICAÇÕES - NOVO ESTILO */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.3s ease-out;
+            transition: transform 0.3s, opacity 0.3s;
+            border-left: 4px solid var(--primary-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notification.fade-out {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        .notification.self-destruct {
+            border-left-color: #ff5252;
+        }
+
+        .notification.typing {
+            border-left-color: #25D366;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .notification.self-destruct .notification-icon {
+            background-color: #ff5252;
+        }
+
+        .notification.typing .notification-icon {
+            background-color: #25D366;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .notification-message {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .notification-close:hover {
+            background: #f5f5f5;
+        }
+
+        .notification-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background-color: var(--primary-color);
+            width: 100%;
+            transform-origin: left;
+            animation: progressBar 5s linear forwards;
+        }
+
+        .notification.self-destruct .notification-progress {
+            background-color: #ff5252;
+        }
+
+        .notification.typing .notification-progress {
+            background-color: #25D366;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes progressBar {
+            from {
+                transform: scaleX(1);
+            }
+            to {
+                transform: scaleX(0);
+            }
+        }
+
+        .dark-theme .notification {
+            background: #2d2d42;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .notification-title {
+            color: #e0e0e0;
+        }
+
+        .dark-theme .notification-message {
+            color: #aaa;
+        }
+
+        .dark-theme .notification-close:hover {
+            background: #3a3a5a;
+        }
+
         /* MOBILE RESPONSIVE - CORREÇÕES */
         @media (max-width: 768px) {
             .container {
@@ -1059,6 +1207,16 @@
             .theme-option {
                 width: 25px;
                 height: 25px;
+            }
+            
+            .notification-container {
+                top: 10px;
+                right: 10px;
+                max-width: calc(100% - 20px);
+            }
+            
+            .notification {
+                padding: 12px;
             }
             
             .mobile-nav {
@@ -1128,6 +1286,9 @@
     </style>
 </head>
 <body class="theme-blue">
+    <!-- Container de Notificações -->
+    <div class="notification-container" id="notificationContainer"></div>
+
     <div class="theme-selector">
         <div class="theme-option theme-blue active" data-theme="blue"></div>
         <div class="theme-option theme-green" data-theme="green"></div>
@@ -1362,6 +1523,7 @@
         const typingIndicator = document.getElementById('typingIndicator');
         const typingUsers = document.getElementById('typingUsers');
         const backToChatsBtn = document.getElementById('backToChatsBtn');
+        const notificationContainer = document.getElementById('notificationContainer');
 
         // App State
         let currentUser = '';
@@ -1383,6 +1545,9 @@
         let currentChat = 'global';
         let typingUsersList = {};
         let currentTheme = localStorage.getItem('currentTheme') || 'blue';
+        let isWindowFocused = true;
+        let notificationSound = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==');
+        let notificationIds = new Set();
 
         // Proxy configurations
         const proxyConfigs = {
@@ -1524,6 +1689,17 @@
         initializeThemes();
         initializeMobileNavigation();
 
+        // Configurar detecção de foco da janela
+        window.addEventListener('focus', () => {
+            isWindowFocused = true;
+            // Remover todas as notificações quando a janela ganha foco
+            clearAllNotifications();
+        });
+
+        window.addEventListener('blur', () => {
+            isWindowFocused = false;
+        });
+
         // Proxy selection handler
         proxySelect.addEventListener('change', function() {
             if (this.value === 'custom') {
@@ -1653,6 +1829,9 @@
                 
                 // Listen for typing indicators
                 listenForTyping();
+                
+                // Solicitar permissão para notificações
+                requestNotificationPermission();
             } else {
                 alert('Senha incorreta ou nome de usuário vazio! Tente novamente.');
                 passwordInput.value = '';
@@ -1733,6 +1912,11 @@
                 }
                 
                 updateTypingIndicator();
+                
+                // Mostrar notificação se alguém estiver digitando e a janela não estiver em foco
+                if (Object.keys(typingUsersList).length > 0 && !isWindowFocused) {
+                    showTypingNotification();
+                }
             });
         }
 
@@ -2079,6 +2263,29 @@
                 // Mark messages as read
                 markMessagesAsRead();
             });
+            
+            // Listen for new messages for notifications
+            database.ref('messages').on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                const messageId = snapshot.key;
+                
+                // Only show notifications for messages from other users in the current chat
+                if (message.originalSender !== currentUser && 
+                    (message.chat === currentChat || (currentChat === 'global' && !message.chat)) &&
+                    !isWindowFocused) {
+                    
+                    // Don't show notification if we already have one for this message
+                    if (!notificationIds.has(messageId)) {
+                        notificationIds.add(messageId);
+                        
+                        if (message.selfDestruct) {
+                            showSelfDestructNotification(message);
+                        } else {
+                            showMessageNotification(message);
+                        }
+                    }
+                }
+            });
         }
 
         // Display message in the chat
@@ -2301,6 +2508,170 @@
                     database.ref().update(updates);
                 }
             });
+        }
+
+        // SISTEMA DE NOTIFICAÇÕES
+
+        // Solicitar permissão para notificações
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    console.log("Permissão para notificações:", permission);
+                });
+            }
+        }
+
+        // Mostrar notificação de nova mensagem
+        function showMessageNotification(message) {
+            let messageText = message.content;
+            if (message.type === 'image') {
+                messageText = '📷 Enviou uma imagem';
+            } else if (message.type === 'file') {
+                messageText = `📎 Enviou um arquivo: ${message.fileName}`;
+            }
+            
+            // Criar notificação personalizada
+            createCustomNotification(
+                message.sender,
+                messageText,
+                'message'
+            );
+            
+            // Tentar usar a API de notificações do navegador
+            if ("Notification" in window && Notification.permission === "granted" && !isWindowFocused) {
+                new Notification(`${message.sender} - Chat Global`, {
+                    body: messageText,
+                    icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTIiIGZpbGw9IiMxMjhDN0UiLz4KPHBhdGggZD0iTTQyLjY2NjcgNDIuNjY2N0gyMS4zMzMzVjM3LjMzMzNINDIuNjY2N1Y0Mi42NjY3Wk00Mi42NjY3IDMySDIxLjMzMzNWMjYuNjY2N0g0Mi42NjY3VjMyWk0yMS4zMzMzIDIxLjMzMzNINDIuNjY2N1YxNkgyMS4zMzMzVjIxLjMzMzNaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K',
+                    tag: 'chat-message'
+                });
+            }
+            
+            // Reproduzir som de notificação
+            playNotificationSound();
+        }
+
+        // Mostrar notificação de mensagem de auto-destruição
+        function showSelfDestructNotification(message) {
+            createCustomNotification(
+                message.sender,
+                '💣 Enviou uma mensagem secreta',
+                'self-destruct'
+            );
+            
+            // Tentar usar a API de notificações do navegador
+            if ("Notification" in window && Notification.permission === "granted" && !isWindowFocused) {
+                new Notification(`${message.sender} - Chat Global`, {
+                    body: '💣 Enviou uma mensagem secreta',
+                    icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTIiIGZpbGw9IiNGRjUyNTIiLz4KPHBhdGggZD0iTTMyIDQyLjY2NjdDMjcuOTUwNyA0Mi42NjY3IDI0LjY2NjcgMzkuMzgzNyAyNC42NjY3IDM1LjMzMzNWMjYuNjY2N0MyNC42NjY3IDI1LjkzNjIgMjUuMDYxOSAyNS4yNjgxIDI1LjY5NjcgMjQuODg1M0wyOS4zNjMzIDIyLjIyODdDMzAuMTg3IDIxLjcxMDcgMzAuNjY2NyAyMC44MTQ3IDMwLjY2NjcgMTkuODUzM1YxOC42NjY3QzMwLjY2NjcgMTcuNTYyMiAzMS41NjIyIDE2LjY2NjcgMzIuNjY2NyAxNi42NjY3QzMzLjc3MTIgMTYuNjY2NyAzNC42NjY3IDE3LjU2MjIgMzQuNjY2NyAxOC42NjY3VjE5Ljg1MzNDMzQuNjY2NyAyMC44MTQ3IDM1LjE0NjMgMjEuNzEwNyAzNS45NyAyMi4yMjg3TDM5LjYzMzMgMjQuODg1M0M0MC4yNjgxIDI1LjI2ODEgNDAuNjY2NyAyNS45MzYyIDQwLjY2NjcgMjYuNjY2N1YzNS4zMzMzQzQwLjY2NjcgMzkuMzgzNyAzNy4zODI3IDQyLjY2NjcgMzMuMzMyMyA0Mi42NjY3SDMyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==',
+                    tag: 'self-destruct-message'
+                });
+            }
+            
+            // Reproduzir som de notificação
+            playNotificationSound();
+        }
+
+        // Mostrar notificação de digitação
+        function showTypingNotification() {
+            const typingUsersCount = Object.keys(typingUsersList).length;
+            let displayText = '';
+            
+            if (typingUsersCount === 1) {
+                const userName = Object.values(typingUsersList)[0];
+                displayText = `${userName} está digitando...`;
+            } else if (typingUsersCount > 1) {
+                displayText = `${typingUsersCount} pessoas estão digitando...`;
+            }
+            
+            if (displayText) {
+                createCustomNotification(
+                    'Chat Global',
+                    displayText,
+                    'typing'
+                );
+            }
+        }
+
+        // Criar notificação personalizada
+        function createCustomNotification(title, message, type = 'message') {
+            const notificationId = Date.now().toString();
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.id = `notification-${notificationId}`;
+            
+            let icon = 'fas fa-comment';
+            if (type === 'self-destruct') {
+                icon = 'fas fa-bomb';
+            } else if (type === 'typing') {
+                icon = 'fas fa-keyboard';
+            }
+            
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="${icon}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="notification-progress"></div>
+            `;
+            
+            notificationContainer.appendChild(notification);
+            
+            // Fechar notificação ao clicar no botão X
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.addEventListener('click', () => {
+                closeNotification(notificationId);
+            });
+            
+            // Fechar notificação automaticamente após 5 segundos
+            setTimeout(() => {
+                closeNotification(notificationId);
+            }, 5000);
+            
+            // Fechar notificação ao clicar nela
+            notification.addEventListener('click', () => {
+                closeNotification(notificationId);
+                window.focus();
+            });
+        }
+
+        // Fechar notificação
+        function closeNotification(notificationId) {
+            const notification = document.getElementById(`notification-${notificationId}`);
+            if (notification) {
+                notification.classList.add('fade-out');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }
+        }
+
+        // Limpar todas as notificações
+        function clearAllNotifications() {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(notification => {
+                notification.classList.add('fade-out');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            });
+            
+            // Limpar IDs de notificações
+            notificationIds.clear();
+        }
+
+        // Reproduzir som de notificação
+        function playNotificationSound() {
+            try {
+                notificationSound.play();
+            } catch (e) {
+                console.log("Não foi possível reproduzir o som da notificação:", e);
+            }
         }
 
         // Helper functions
